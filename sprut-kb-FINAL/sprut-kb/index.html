@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>СПРУТ — База знаний FirKaan</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root {
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--border:#30363d;
+  --text:#e6edf3;--text2:#8b949e;--text3:#656d76;
+  --cashier:#3fb950;--commodity:#f0883e;--purchasing:#2f81f7;
+  --sales:#bc8cff;--operator:#39d353;--accountant:#ffa657;
+  --director:#ff7b72;--it:#79c0ff;--category:#f778ba;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:48px}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:18px 16px 14px;text-align:center;position:sticky;top:0;z-index:10}
+.badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#2f81f7;background:rgba(47,129,247,.1);border:1px solid rgba(47,129,247,.25);padding:3px 10px;border-radius:100px;margin-bottom:8px}
+.header h1{font-size:clamp(18px,5vw,26px);font-weight:800;background:linear-gradient(135deg,#e6edf3,#79c0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{font-size:12px;color:var(--text2);margin-top:3px}
+.search-wrap{padding:14px 16px 0;max-width:640px;margin:0 auto}
+.search-box{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:13px 16px 13px 44px;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s}
+.search-box:focus{border-color:#2f81f7}
+.search-box::placeholder{color:var(--text3)}
+.s-wrap{position:relative}
+.s-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.lbl{padding:22px 16px 10px;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'JetBrains Mono',monospace;max-width:640px;margin:0 auto;display:block}
+.common-link{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid rgba(230,237,243,.18);border-radius:14px;padding:16px 18px;margin:0 16px;max-width:640px;margin-left:auto;margin-right:auto;cursor:pointer;text-decoration:none;color:inherit;transition:all .18s}
+.common-link:hover,.common-link:active{border-color:var(--text);background:var(--bg3)}
+.c-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(230,237,243,.08);border:1px solid rgba(230,237,243,.12)}
+.c-text h3{font-size:15px;font-weight:700}
+.c-text p{font-size:11px;color:var(--text2);margin-top:2px}
+.c-arr{margin-left:auto;color:var(--text3);font-size:20px;flex-shrink:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;max-width:640px;margin:0 auto}
+@media(min-width:520px){.grid{grid-template-columns:1fr 1fr 1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 14px;cursor:pointer;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:flex-start;transition:all .18s;position:relative;overflow:hidden;min-height:110px}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--rc)}
+.card:hover,.card:active{border-color:var(--rc);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.c-emoji{font-size:26px;margin-bottom:8px}
+.c-name{font-size:13px;font-weight:700;line-height:1.3}
+.c-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.c-tag{position:absolute;top:9px;right:9px;font-size:9px;padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:600;background:color-mix(in srgb,var(--rc) 18%,transparent);color:var(--rc);border:1px solid color-mix(in srgb,var(--rc) 28%,transparent)}
+.sr-wrap{display:none;padding:0 16px;max-width:640px;margin:6px auto 0}
+.sr-wrap.show{display:block}
+.sr{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;text-decoration:none;color:inherit;transition:background .15s}
+.sr:hover{background:var(--bg3);border-color:#2f81f7}
+.sr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sr-name{font-size:13px}
+.sr-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.footer{text-align:center;padding:28px 16px 0;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="badge">FirKaan · ПС СПРУТ</div>
+  <h1>База знаний СПРУТ</h1>
+  <p>Выберите свою должность</p>
+</div>
+
+<div class="search-wrap">
+  <div class="s-wrap">
+    <span class="s-ico">🔍</span>
+    <input class="search-box" type="search" placeholder="Найти раздел, главу, должность..." id="s" autocomplete="off" oninput="go(this.value)">
+  </div>
+</div>
+<div class="sr-wrap" id="sr"></div>
+
+<span class="lbl" id="l1">📖 Общая документация</span>
+<div id="cb" style="padding:0 16px;max-width:640px;margin:0 auto">
+  <a class="common-link" href="common/index.html">
+    <div class="c-icon">📚</div>
+    <div class="c-text"><h3>Полное руководство ПС СПРУТ</h3><p>Все 30 глав · BackOffice + POS · для всех должностей</p></div>
+    <div class="c-arr">›</div>
+  </a>
+</div>
+
+<span class="lbl" id="l2">👤 По должности</span>
+<div class="grid" id="rg">
+  <a class="card" style="--rc:var(--cashier)" href="cashier/index.html">
+    <div class="c-emoji">🛒</div><div class="c-name">Кассир</div>
+    <div class="c-sub">POS · смены · оплаты</div>
+    <div class="c-tag">КАССА</div>
+  </a>
+  <a class="card" style="--rc:var(--commodity)" href="commodity/index.html">
+    <div class="c-emoji">📦</div><div class="c-name">Товаровед / Приёмщик</div>
+    <div class="c-sub">приход · каталог · инвент.</div>
+    <div class="c-tag">СКЛАД</div>
+  </a>
+  <a class="card" style="--rc:var(--purchasing)" href="purchasing/index.html">
+    <div class="c-emoji">🤝</div><div class="c-name">Менеджер по закупкам</div>
+    <div class="c-sub">поставщики · заказы</div>
+    <div class="c-tag">ЗАКУПКИ</div>
+  </a>
+  <a class="card" style="--rc:var(--sales)" href="sales/index.html">
+    <div class="c-emoji">💼</div><div class="c-name">Менеджер по продажам</div>
+    <div class="c-sub">клиенты · заказы · отгрузка</div>
+    <div class="c-tag">ПРОДАЖИ</div>
+  </a>
+  <a class="card" style="--rc:var(--operator)" href="operator/index.html">
+    <div class="c-emoji">🖥️</div><div class="c-name">Оператор BackOffice</div>
+    <div class="c-sub">документы · пересорт</div>
+    <div class="c-tag">БЭКОФИС</div>
+  </a>
+  <a class="card" style="--rc:var(--accountant)" href="accountant/index.html">
+    <div class="c-emoji">💰</div><div class="c-name">Бухгалтер</div>
+    <div class="c-sub">деньги · 1С · НДС</div>
+    <div class="c-tag">ФИНАНСЫ</div>
+  </a>
+  <a class="card" style="--rc:var(--director)" href="director/index.html">
+    <div class="c-emoji">🏪</div><div class="c-name">Директор / Администратор</div>
+    <div class="c-sub">отчёты · контроль</div>
+    <div class="c-tag">УПРАВЛ.</div>
+  </a>
+  <a class="card" style="--rc:var(--it)" href="it/index.html">
+    <div class="c-emoji">⚙️</div><div class="c-name">IT-администратор</div>
+    <div class="c-sub">серверы · права · интеграции</div>
+    <div class="c-tag">IT</div>
+  </a>
+  <a class="card" style="--rc:var(--category)" href="category/index.html">
+    <div class="c-emoji">📊</div><div class="c-name">Категорийный менеджер</div>
+    <div class="c-sub">анализ · ценники</div>
+    <div class="c-tag">АНАЛИТ.</div>
+  </a>
+</div>
+
+<div class="footer">ПС СПРУТ™ · ВИМАС Технологии · FirKaan KB v1.0</div>
+
+<script>
+const D=[
+  {n:'Полное руководство ПС СПРУТ',s:'Все 30 глав',u:'common/index.html',c:'#e6edf3'},
+  {n:'Кассир',s:'POS, смены, оплаты',u:'cashier/index.html',c:'#3fb950'},
+  {n:'Товаровед / Приёмщик',s:'Приход, каталог, инвентаризация',u:'commodity/index.html',c:'#f0883e'},
+  {n:'Менеджер по закупкам',s:'Поставщики, заказы на поставку',u:'purchasing/index.html',c:'#2f81f7'},
+  {n:'Менеджер по продажам',s:'Клиенты, заказы, отгрузка',u:'sales/index.html',c:'#bc8cff'},
+  {n:'Оператор BackOffice',s:'Документы, пересорт, цены',u:'operator/index.html',c:'#39d353'},
+  {n:'Бухгалтер',s:'Денежные средства, экспорт 1С, НДС',u:'accountant/index.html',c:'#ffa657'},
+  {n:'Директор / Администратор',s:'Отчёты, кассовая книга, контроль',u:'director/index.html',c:'#ff7b72'},
+  {n:'IT-администратор',s:'Серверы, права, файловый обмен',u:'it/index.html',c:'#79c0ff'},
+  {n:'Категорийный менеджер',s:'Анализ данных, ценники, ассортимент',u:'category/index.html',c:'#f778ba'},
+  {n:'Введение в ПС СПРУТ',s:'Схема функционирования, список модулей',u:'common/ch01.html',c:'#e6edf3'},
+  {n:'Архитектура системы',s:'ЦБД, ЛБД, торговые площадки, устройства',u:'common/ch02.html',c:'#e6edf3'},
+  {n:'Администрирование',s:'Установка, права, аудит, Oracle',u:'common/ch03.html',c:'#79c0ff'},
+  {n:'Каталог товаров',s:'Структура, единицы, штрих-коды, цены',u:'common/ch04.html',c:'#f0883e'},
+  {n:'Закупка товаров',s:'Заказы на поставку, взаиморасчёты',u:'common/ch05.html',c:'#2f81f7'},
+  {n:'Приходование товаров',s:'Приходные накладные, акты приёмки',u:'common/ch06.html',c:'#f0883e'},
+  {n:'Продажа товаров',s:'Заказы, клиенты, расходные накладные',u:'common/ch07.html',c:'#bc8cff'},
+  {n:'Возвраты поставщикам',s:'Оформление, взаиморасчёты',u:'common/ch08.html',c:'#2f81f7'},
+  {n:'Возвраты от клиентов',s:'Журнал возвратов, тара',u:'common/ch09.html',c:'#bc8cff'},
+  {n:'Ценообразование и скидки',s:'Наценки, дилерские категории, расценка',u:'common/ch10.html',c:'#f778ba'},
+  {n:'Оптовая торговля',s:'Особенности оптовых продаж',u:'common/ch11.html',c:'#bc8cff'},
+  {n:'Розничная торговля',s:'Кассовая книга, Z-отчёты, кредитные карты',u:'common/ch12.html',c:'#3fb950'},
+  {n:'Учёт денежных средств',s:'Платежи, безнал, лицевые счета',u:'common/ch13.html',c:'#ffa657'},
+  {n:'Учёт тары',s:'Возвратная и невозвратная тара',u:'common/ch14.html',c:'#f0883e'},
+  {n:'Инвентаризация',s:'Пересчёт, акты пересорта, корректировки',u:'common/ch19.html',c:'#f0883e'},
+  {n:'Пересортица и проблемные товары',s:'Ошибки, дубли, исправление',u:'common/ch18.html',c:'#ff7b72'},
+  {n:'Управление весами',s:'Настройка, загрузка, эксплуатация',u:'common/ch20.html',c:'#39d353'},
+  {n:'Печать ценников и прайс-листов',s:'Модуль печати, форматы',u:'common/ch21.html',c:'#f778ba'},
+  {n:'Экспорт бухгалтерских данных',s:'1С, Oracle GL, клиент-банк',u:'common/ch22.html',c:'#ffa657'},
+  {n:'Анализ данных в ПС СПРУТ',s:'Отчёты, консолидированная аналитика',u:'common/ch24.html',c:'#ffa657'},
+  {n:'Обмен с ТСД',s:'Терминалы сбора данных, приход, инвентаризация',u:'common/ch27.html',c:'#79c0ff'},
+  {n:'Сервер торговой площадки',s:'Конфигурирование, модули СТП',u:'common/ch30.html',c:'#79c0ff'},
+  {n:'СПРУТ POS',s:'Кассовый терминал, смены, оплаты',u:'cashier/pos.html',c:'#3fb950'},
+];
+function go(q){
+  const sr=document.getElementById('sr');
+  const show=v=>['l1','l2','cb','rg'].forEach(id=>document.getElementById(id).style.display=v);
+  if(!q.trim()){sr.classList.remove('show');sr.innerHTML='';show('');return;}
+  show('none');
+  const f=D.filter(d=>d.n.toLowerCase().includes(q.toLowerCase())||d.s.toLowerCase().includes(q.toLowerCase()));
+  sr.innerHTML=f.length?f.map(d=>`<a class="sr" href="${d.u}"><div class="sr-dot" style="background:${d.c}"></div><div><div class="sr-name">${d.n}</div><div class="sr-sub">${d.s}</div></div><div style="margin-left:auto;color:var(--text3);font-size:18px">›</div></a>`).join('')
+    :'<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Ничего не найдено</div>';
+  sr.classList.add('show');
+}
+</script>
+</body>
+</html>

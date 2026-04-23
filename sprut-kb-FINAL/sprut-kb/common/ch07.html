@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Глава 7 — Продажа товаров</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#656d76;--acc:#2f81f7}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+.tb{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+.bk{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);min-height:40px;white-space:nowrap}
+.bk:active{background:var(--border)}
+.tb-t{font-size:13px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ch-nav::-webkit-scrollbar{display:none}
+.cp{display:inline-flex;align-items:center;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;text-decoration:none;white-space:nowrap}
+.cp.here{background:rgba(47,129,247,.15);border-color:rgba(47,129,247,.4);color:var(--acc)}
+.hero{padding:24px 16px 20px;max-width:720px;margin:0 auto;border-bottom:1px solid var(--border)}
+.ch-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--acc);background:rgba(47,129,247,.1);border:1px solid rgba(47,129,247,.25);padding:3px 10px;border-radius:100px;margin-bottom:10px}
+.hero h1{font-size:clamp(20px,5vw,28px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.hero .lead{font-size:14px;color:var(--text2);line-height:1.6;max-width:600px}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.mtag{font-size:10px;padding:3px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'JetBrains Mono',monospace}
+.toc{margin:16px;max-width:688px;margin-left:auto;margin-right:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.toc-h{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;background:var(--bg3)}
+.toc-h:active{background:var(--border)}
+.toc-arr{margin-left:auto;color:var(--text3);font-size:16px;transition:transform .2s}
+.toc.open .toc-arr{transform:rotate(90deg)}
+.toc-b{display:none;padding:8px 0}
+.toc.open .toc-b{display:block}
+.toc-i{display:flex;align-items:center;gap:10px;padding:8px 16px;text-decoration:none;color:var(--text2);font-size:13px}
+.toc-i:active{background:var(--bg3);color:var(--text)}
+.toc-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);min-width:32px}
+.content{max-width:720px;margin:0 auto;padding:0 16px}
+.sec{margin-top:28px}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec h2{font-size:18px;font-weight:700;margin-bottom:12px;line-height:1.3;border-top:2px solid var(--acc);padding-top:12px}
+.sec h3{font-size:15px;font-weight:700;margin:16px 0 8px;color:var(--text)}
+.para{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px}
+.para strong{color:var(--text)}
+.para em{color:var(--acc);font-style:normal}
+.ibox{display:flex;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6;margin:12px 0}
+.ibox.blue{background:rgba(47,129,247,.07);border:1px solid rgba(47,129,247,.22)}
+.ibox.orange{background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.22)}
+.ibox-i{font-size:18px;flex-shrink:0}
+.mod-grid{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.mod{display:flex;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px}
+.mod-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.mod-name{font-weight:600;color:var(--text);margin-bottom:3px}
+.mod-desc{color:var(--text2);line-height:1.5;font-size:12px}
+.m-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:600;margin-left:6px;vertical-align:middle;background:rgba(47,129,247,.12);color:var(--acc);border:1px solid rgba(47,129,247,.2)}
+.scheme{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);line-height:2.2;overflow-x:auto}
+.hl{color:var(--acc);font-weight:600}
+.hl2{color:#f0883e;font-weight:600}
+.hl3{color:#3fb950;font-weight:600}
+.arr{color:var(--text3)}
+.feat-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.feat{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:13px}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px}
+.feat-text{color:var(--text2);line-height:1.5}
+.feat-text strong{color:var(--text)}
+.nav-bottom{display:flex;justify-content:space-between;padding:20px 16px 0;max-width:720px;margin:32px auto 0;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text2);font-size:13px;min-height:44px}
+.nav-btn:active{background:var(--bg3)}
+.nav-btn.next{background:rgba(47,129,247,.1);border-color:rgba(47,129,247,.3);color:var(--acc)}
+.footer{text-align:center;padding:28px 16px 0;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+</style></head><body>
+<div class="tb"><a class="bk" href="index.html">← Все главы</a><div class="tb-t">Гл.7 · Продажа товаров</div></div>
+<div class="ch-nav"><a class="cp" href="ch01.html">01</a><a class="cp" href="ch02.html">02</a><a class="cp" href="ch03.html">03</a><a class="cp" href="ch04.html">04</a><a class="cp" href="ch05.html">05</a><a class="cp" href="ch06.html">06</a><a class="cp  here" href="ch07.html">07</a><a class="cp" href="ch08.html">08</a><a class="cp" href="ch09.html">09</a><a class="cp" href="ch10.html">10</a><a class="cp" href="ch11.html">11</a><a class="cp" href="ch12.html">12</a><a class="cp" href="ch13.html">13</a><a class="cp" href="ch14.html">14</a><a class="cp" href="ch15.html">15</a><a class="cp" href="ch16.html">16</a><a class="cp" href="ch17.html">17</a><a class="cp" href="ch18.html">18</a><a class="cp" href="ch19.html">19</a><a class="cp" href="ch20.html">20</a><a class="cp" href="ch21.html">21</a><a class="cp" href="ch22.html">22</a><a class="cp" href="ch23.html">23</a><a class="cp" href="ch24.html">24</a><a class="cp" href="ch25.html">25</a><a class="cp" href="ch26.html">26</a><a class="cp" href="ch27.html">27</a><a class="cp" href="ch28.html">28</a><a class="cp" href="ch29.html">29</a><a class="cp" href="ch30.html">30</a></div>
+<div class="hero"><div class="ch-badge">Глава 7 · Справочное руководство</div>
+<h1>Продажа товаров</h1><p class="lead">Клиенты и ценообразование, оформление заказов, счета-фактуры, расходные накладные, взаиморасчёты, договора.</p>
+<div class="meta-row"><span class="mtag">Менеджер по продажам</span><span class="mtag">Оператор</span><span class="mtag">Бухгалтер</span></div></div>
+<div class="content">
+<div class="sec">
+  <div class="sec-label">Введение</div>
+  <p class="para">Реализация товаров в ПС «СПРУТ» возможна несколькими способами: через Журнал «Заказы» модуля «Расход» (менеджеры), через модуль «Оптово-Розничная торговля» (операторы выписки), через СПРУТ POS (кассиры розницы). В данной главе рассматривается основной случай — Журнал «Заказы» модуля <strong>«Расход»</strong>.</p>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 1</div>
+  <h2>Ввод и поиск клиентов</h2>
+  <p class="para">Все клиенты должны быть занесены в Справочник «Клиентов и поставщиков» до начала работы. Клиенты делятся на <strong>юридических</strong> и <strong>физических лиц</strong> — схемы прохождения заказов для них отличаются.</p>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Поиск клиента</strong> — по коду (из карточки клиента), по названию/ФИО, по ИИН/БИН.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Регион и менеджер</strong> — каждый клиент привязан к региону, регион — к менеджеру. При создании заказа менеджер подставляется автоматически.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Подставное лицо</strong> — для юр. лица можно указать физ. лицо, на которое выписываются расходные накладные при оплате наличными.</div></div>
+  </div>
+  <h3>Параметры клиента, влияющие на ценообразование</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Параметр</th><th>Влияние</th></tr>
+    <tr><td><strong>Дилерская категория</strong></td><td>Базовый уровень цены по всем товарам</td></tr>
+    <tr><td><strong>Процент скидки</strong></td><td>Фиксированная скидка от цены дилерской категории</td></tr>
+    <tr><td><strong>Доп. скидка по группам / производителям</strong></td><td>Скидка на конкретные группы товаров или товары производителя</td></tr>
+    <tr><td><strong>Вариант оплаты</strong></td><td>Предоплата / отсрочка — влияет на схему контроля прохождения заказа</td></tr>
+    <tr><td><strong>Макс. задолженность</strong></td><td>Лимит долга. При превышении — регистрация нового заказа блокируется</td></tr>
+  </table></div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 2</div>
+  <h2>Оформление заказов</h2>
+  <h3>Создание заказа</h3>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="st">Модуль «Расход» → Журнал «Заказы» → «Добавить».</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Выберите клиента → система автоматически подставит: дилерскую категорию, % скидки, вариант оплаты, менеджера.</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Укажите адрес доставки (из сохранённых адресов клиента или введите новый).</div></div>
+    <div class="step"><div class="sn">4</div><div class="st">Добавьте товары: по штрих-коду, артикулу, названию или выбором из каталога.</div></div>
+    <div class="step"><div class="sn">5</div><div class="st">Цены рассчитываются автоматически с учётом дилерской категории, объёма заказа и скидок клиента.</div></div>
+    <div class="step"><div class="sn">6</div><div class="st">Сохраните — заказ в статусе <strong>«Готовится»</strong>.</div></div>
+  </div>
+  <div class="ibox blue"><span class="ibox-i">ℹ️</span><div>Дилерская категория, скидка и вариант оплаты фиксируются в заказе на момент создания и не меняются при изменении параметров клиента. Для обновления — перевыберите клиента или используйте специальную кнопку (только в статусе «Готовится»).</div></div>
+
+  <h3>Статусы заказа клиента</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Статус</th><th>Описание</th><th>Цвет</th></tr>
+    <tr><td><strong>Готовится</strong></td><td>Черновик — можно редактировать</td><td style="color:#3fb950">Зелёный</td></tr>
+    <tr><td><strong>Выписаны счета-фактуры</strong></td><td>Счёт выписан, ожидается оплата</td><td style="color:#8b949e">Чёрный</td></tr>
+    <tr><td><strong>Оплата зарегистрирована</strong></td><td>Оплата получена в срок</td><td style="color:#2f81f7">Синий</td></tr>
+    <tr><td><strong>Отгружен</strong></td><td>Расходная накладная оформлена</td><td style="color:#8b949e">Чёрный</td></tr>
+    <tr><td><strong>Выполнен</strong></td><td>Всё отгружено и оплачено</td><td style="color:#8b949e">Коричневый</td></tr>
+    <tr><td><strong>Просрочен</strong></td><td>Истёк срок отсрочки платежа</td><td style="color:#f85149">Красный</td></tr>
+  </table></div>
+
+  <h3>Расчёт цен в заказе</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Базовая цена</strong> — из дилерской категории клиента.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Скидка %</strong> — применяется к базовой цене, если задана для клиента.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Барьер дилерской категории</strong> — при превышении суммы заказа порогового значения цены могут пересчитаться по более высокой (льготной) категории.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Цена спецпредложения</strong> — при достижении объёма по конкретному товару.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Ценовой договор</strong> — фиксированные цены на определённые товары, прописанные в договоре с клиентом.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 3</div>
+  <h2>Счёт-фактура и расходная накладная</h2>
+  <h3>Выписка счёта-фактуры</h3>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="st">В заказе → кнопка <strong>«Выписать счёт-фактуру»</strong> (для юр. лиц) или «Счёт» (для физ. лиц).</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Распечатайте и передайте клиенту для оплаты.</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Несколько счетов-фактур к одному заказу — возможно (частичные отгрузки).</div></div>
+  </div>
+
+  <h3>Регистрация оплаты</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>С остатка на счету (R1 — безнал, R2 — нал)</strong> — клиент должен иметь положительный остаток на лицевом счету.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Оплата по платёжке</strong> — привязка безналичного ПП из журнала «Банковских платежей».</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Прямая оплата (через кассу)</strong> — для наличных расчётов, в т.ч. доплата от юр. лиц.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>С отсрочкой платежа</strong> — регистрируется задолженность клиента на всю неоплаченную сумму.</div></div>
+  </div>
+  <div class="ibox warn"><span class="ibox-i">⚠️</span><div>При превышении максимально допустимой задолженности клиента — регистрация оплаты с отсрочкой блокируется. Необходимо либо увеличить лимит, либо получить оплату по предыдущим заказам.</div></div>
+
+  <h3>Оформление расходной накладной</h3>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="st">После регистрации оплаты → кнопка <strong>«Оформить расходную накладную»</strong>.</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Укажите склад отгрузки → подтвердите → товары списываются с остатков.</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Распечатайте расходную накладную и налоговую накладную.</div></div>
+  </div>
+  <div class="ibox blue"><span class="ibox-i">ℹ️</span><div>Налоговые накладные выписываются раздельно: для товаров с НДС и без НДС. При необходимости — отдельно для алкоголя и табака (если компания не имеет оптовой лицензии).</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 4</div>
+  <h2>Контроль взаиморасчётов с клиентами</h2>
+  <h3>Лицевой счёт клиента</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Поступления на счёт</strong> — зачисление денег: авансы, возвраты, поступления от банка.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Убытия со счёта</strong> — регистрация задолженности при оформлении заказов с отсрочкой.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Остаток срока задолженности</strong> — дней до окончания отсрочки. Отрицательное значение = просрочка.</div></div>
+  </div>
+
+  <h3>Визуальный контроль в журнале заказов</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text" style="color:#3fb950"><strong>Зелёный</strong> — статус «Готовится».</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text" style="color:#2f81f7"><strong>Синий</strong> — оплата зарегистрирована, срок не просрочен.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text" style="color:#f85149"><strong>Красный</strong> — просрочена оплата. Немедленно принять меры.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Коричневый</strong> — заказ полностью выполнен и оплачен.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 5</div>
+  <h2>Договора с клиентами</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Тип</th><th>Описание</th></tr>
+    <tr><td><strong>Ценовой договор</strong></td><td>Фиксированные цены на определённые товары. Используются вместо обычного расчёта цен.</td></tr>
+    <tr><td><strong>Товарный договор</strong></td><td>Заявка покупателя со списком нужных товаров. Поддерживает автоматическое резервирование и частичную отгрузку.</td></tr>
+  </table></div>
+  <p class="para">Товарный договор можно составить на основании клиентского заказа. Договор закрывается после выполнения всех позиций или принудительно.</p>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 6</div>
+  <h2>Журнал расходных накладных и резервирование</h2>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Журнал расходных накладных</strong> — все отгрузки. Контроль выдачи товаров со склада: сличение с заказом и счётом-фактурой.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Журнал резервирования</strong> — товары, зарезервированные под конкретные заказы. Зарезервированный товар не доступен для других заказов.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Журнал счетов-фактур</strong> — все выписанные счета с их статусами оплаты и привязанными платёжными поручениями.</div></div>
+  </div>
+</div>
+</div>
+<div class="nav-bottom"><a class="nav-btn" href="index.html">← Все главы</a><a class="nav-btn" href="ch06.html">← Глава 6</a><a class="nav-btn next" href="ch08.html">Глава 8 →</a></div>
+<div class="footer">ПС СПРУТ™ · ВИМАС Технологии, 1997–2025 · FirKaan KB v1.0</div>
+</body></html>
