@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СПРУТ POS — База знаний</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:       #0d1117;
+  --bg2:      #161b22;
+  --bg3:      #1c2330;
+  --bg4:      #21262d;
+  --border:   #30363d;
+  --border2:  #3d444d;
+  --text:     #e6edf3;
+  --text2:    #8b949e;
+  --text3:    #656d76;
+  --accent:   #2f81f7;
+  --accent-h: #1f6feb;
+  --green:    #3fb950;
+  --orange:   #d29922;
+  --red:      #f85149;
+  --purple:   #bc8cff;
+  --teal:     #39d353;
+
+  /* chapter colors */
+  --c1: #2f81f7;
+  --c2: #3fb950;
+  --c3: #f0883e;
+  --c4: #bc8cff;
+  --c5: #ff7b72;
+  --c6: #39d353;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(47,129,247,0.15), rgba(188,140,255,0.1));
+  border: 1px solid rgba(47,129,247,0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 10px;
+}
+.logo-badge span { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+.sidebar-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.sidebar-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.sidebar-search {
+  padding: 12px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.search-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px 7px 30px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 12px; }
+
+.sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+
+.nav-chapter {
+  padding: 0 8px 4px;
+}
+.nav-chapter-btn {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: none; background: none; cursor: pointer;
+  color: var(--text2);
+  font-size: 12px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  transition: all 0.15s;
+}
+.nav-chapter-btn:hover { background: var(--bg3); color: var(--text); }
+.nav-chapter-btn.active { background: var(--bg3); color: var(--text); }
+.ch-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ch-arrow { margin-left: auto; font-size: 10px; transition: transform 0.2s; color: var(--text3); }
+.nav-chapter-btn.open .ch-arrow { transform: rotate(90deg); }
+
+.nav-sub { display: none; padding: 0 0 4px 24px; }
+.nav-sub.open { display: block; }
+.nav-sub-item {
+  display: block; width: 100%;
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: none; background: none; cursor: pointer;
+  color: var(--text3);
+  font-size: 11px; font-family: 'Inter', sans-serif;
+  text-align: left;
+  transition: all 0.15s;
+}
+.nav-sub-item:hover { background: var(--bg4); color: var(--text2); }
+.nav-sub-item.active { color: var(--accent); background: rgba(47,129,247,0.08); }
+
+.nav-sub-section { 
+  padding: 3px 8px; 
+  font-size: 10px; color: var(--text3); 
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* ── MAIN CONTENT ─────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* ── HEADER ───────────────────────────────────────── */
+.content-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 40px 20px;
+  position: sticky; top: 0; z-index: 10;
+}
+.breadcrumb {
+  font-size: 11px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+.breadcrumb span { color: var(--accent); }
+.content-title { font-size: 22px; font-weight: 700; }
+.content-meta { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.meta-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text3);
+  padding: 2px 8px; border-radius: 4px;
+  background: var(--bg4); border: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── HOME PAGE ────────────────────────────────────── */
+#page-home { padding: 40px; }
+
+.home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+@media(max-width:900px){ .home-grid{ grid-template-columns: 1fr 1fr; } }
+@media(max-width:600px){ .home-grid{ grid-template-columns: 1fr; } }
+
+.chapter-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+  text-align: left;
+  width: 100%;
+}
+.chapter-card:hover {
+  border-color: var(--card-c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.chapter-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--card-c);
+}
+.card-num {
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  color: var(--card-c); margin-bottom: 8px; font-weight: 600;
+}
+.card-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.card-count { font-size: 11px; color: var(--text3); }
+.card-topics { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px; }
+.card-topic {
+  font-size: 10px; padding: 2px 7px; border-radius: 3px;
+  background: var(--bg4); border: 1px solid var(--border);
+  color: var(--text3);
+}
+
+/* ── CHAPTER PAGE ─────────────────────────────────── */
+.chapter-page { display: none; padding: 40px; }
+.chapter-page.active { display: block; }
+
+.section-block {
+  margin-bottom: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+.section-header:hover { background: var(--bg3); }
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text3);
+  min-width: 36px;
+}
+.section-name { font-size: 13px; font-weight: 600; flex: 1; }
+.section-toggle { color: var(--text3); font-size: 11px; transition: transform 0.2s; }
+.section-block.open .section-toggle { transform: rotate(90deg); }
+
+.section-body { display: none; padding: 0 18px 16px; border-top: 1px solid var(--border); }
+.section-block.open .section-body { display: block; }
+
+.subsection {
+  margin-top: 14px;
+}
+.subsection-title {
+  font-size: 12px; font-weight: 600; color: var(--text2);
+  margin-bottom: 8px; display: flex; align-items: center; gap-8px;
+}
+.subsection-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  background: var(--bg4); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 3px; margin-right: 8px;
+}
+
+.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+@media(max-width:700px){ .topic-grid{ grid-template-columns: 1fr; } }
+
+.topic-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px; color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.topic-item:hover { border-color: var(--border2); color: var(--text); background: var(--bg4); }
+.topic-bullet { color: var(--text3); margin-top: 1px; flex-shrink: 0; font-size: 8px; }
+
+.role-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.role-chip {
+  font-size: 10px; padding: 3px 9px; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid;
+}
+
+/* ── DETAIL PAGE ──────────────────────────────────── */
+#page-detail { display: none; padding: 40px; }
+#page-detail.active { display: block; }
+
+.detail-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 16px;
+}
+.detail-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.detail-card h3 .label {
+  font-size: 10px; padding: 2px 7px; border-radius: 3px;
+  background: var(--bg4); border: 1px solid var(--border);
+  color: var(--text3); font-family: 'JetBrains Mono', monospace;
+}
+.step-list { display: flex; flex-direction: column; gap: 8px; }
+.step-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 12px; background: var(--bg3); border-radius: 6px;
+  border: 1px solid var(--border); font-size: 12px;
+}
+.step-num {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  background: var(--accent); color: #fff;
+}
+.step-text { color: var(--text2); line-height: 1.5; }
+.step-text strong { color: var(--text); }
+
+.warning-box {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 14px; border-radius: 8px; font-size: 12px;
+  background: rgba(210,153,34,0.08); border: 1px solid rgba(210,153,34,0.25);
+  color: var(--text2); line-height: 1.5; margin-top: 12px;
+}
+.warning-icon { font-size: 14px; flex-shrink: 0; }
+
+.info-box {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 14px; border-radius: 8px; font-size: 12px;
+  background: rgba(47,129,247,0.08); border: 1px solid rgba(47,129,247,0.25);
+  color: var(--text2); line-height: 1.5; margin-top: 12px;
+}
+
+.key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; }
+.key-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; font-size: 12px;
+}
+.key-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  padding: 2px 6px; background: var(--bg4); border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text); white-space: nowrap; flex-shrink: 0;
+}
+
+/* ── DRIVE INFO ───────────────────────────────────── */
+.drive-info {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin: 40px;
+}
+.drive-info h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+.drive-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.drive-step:last-child { border-bottom: none; padding-bottom: 0; }
+.drive-step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  background: rgba(47,129,247,0.15); border: 1px solid rgba(47,129,247,0.3);
+  color: var(--accent);
+}
+.drive-step-body h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.drive-step-body p { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.drive-step-body code {
+  background: var(--bg4); border: 1px solid var(--border2);
+  padding: 1px 5px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--orange);
+}
+
+/* ── SCROLLBAR ────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── SEARCH HIGHLIGHT ─────────────────────────────── */
+.highlight { background: rgba(210,153,34,0.3); border-radius: 2px; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge"><span>СПРУТ POS</span></div>
+    <div class="sidebar-title">Руководство пользователя</div>
+    <div class="sidebar-sub">Кассовый терминал · v2025</div>
+  </div>
+
+  <div class="sidebar-search">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Поиск по разделам..." id="searchInput" oninput="doSearch(this.value)">
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" id="sidebarNav">
+
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn active" onclick="goHome(); toggleChapter(this)" data-ch="home">
+        <div class="ch-dot" style="background:#8b949e"></div>
+        <span>Главная страница</span>
+      </button>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(1); toggleChapter(this)" data-ch="1">
+        <div class="ch-dot" style="background:var(--c1)"></div>
+        <span>1. Интерфейс</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-1">
+        <div class="nav-sub-section">1.1 Элементы</div>
+        <button class="nav-sub-item" onclick="showDetail('desktop')">Оболочка POS Desktop</button>
+        <button class="nav-sub-item" onclick="showDetail('login-window')">Окно регистрации</button>
+        <button class="nav-sub-item" onclick="showDetail('main-window')">Основное окно</button>
+        <button class="nav-sub-item" onclick="showDetail('search-window')">Окно поиска</button>
+        <button class="nav-sub-item" onclick="showDetail('registry-window')">Реестр документов</button>
+        <button class="nav-sub-item" onclick="showDetail('payment-window')">Окно оплаты</button>
+        <div class="nav-sub-section">1.2–1.4 Настройки</div>
+        <button class="nav-sub-item" onclick="showDetail('interface-control')">Управление интерфейсом</button>
+        <button class="nav-sub-item" onclick="showDetail('language')">Язык интерфейса</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 2 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(2); toggleChapter(this)" data-ch="2">
+        <div class="ch-dot" style="background:var(--c2)"></div>
+        <span>2. Сеанс работы</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-2">
+        <button class="nav-sub-item" onclick="showDetail('launch')">Запуск ПОС</button>
+        <button class="nav-sub-item" onclick="showDetail('auth')">Авторизация</button>
+        <button class="nav-sub-item" onclick="showDetail('hw-check')">Проверка оборудования</button>
+        <div class="nav-sub-section">2.5 Кассовая смена</div>
+        <button class="nav-sub-item" onclick="showDetail('shift-open')">Открытие смены</button>
+        <button class="nav-sub-item" onclick="showDetail('shift-duration')">Длительность смены</button>
+        <button class="nav-sub-item" onclick="showDetail('cash-control')">Контроль наличности</button>
+        <button class="nav-sub-item" onclick="showDetail('shift-close')">Закрытие смены</button>
+        <button class="nav-sub-item" onclick="showDetail('reports')">Z/X отчёты</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 3 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(3); toggleChapter(this)" data-ch="3">
+        <div class="ch-dot" style="background:var(--c3)"></div>
+        <span>3. Кассовые операции</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-3">
+        <div class="nav-sub-section">3.1 Продажи</div>
+        <button class="nav-sub-item" onclick="showDetail('sale-normal')">Обычная продажа</button>
+        <button class="nav-sub-item" onclick="showDetail('sale-alcohol')">Алкоголь / табак</button>
+        <button class="nav-sub-item" onclick="showDetail('sale-cert')">Сертификаты</button>
+        <button class="nav-sub-item" onclick="showDetail('sale-multi')">По нескольким компаниям</button>
+        <button class="nav-sub-item" onclick="showDetail('sale-soft')">Мягкий чек</button>
+        <div class="nav-sub-section">3.2 Возврат</div>
+        <button class="nav-sub-item" onclick="showDetail('return-same')">Возврат по чеку (эта касса)</button>
+        <button class="nav-sub-item" onclick="showDetail('return-other')">Возврат с другой кассы</button>
+        <button class="nav-sub-item" onclick="showDetail('return-no')">Возврат без чека</button>
+        <div class="nav-sub-section">3.3–3.4 Касса</div>
+        <button class="nav-sub-item" onclick="showDetail('cash-in')">Внос денег</button>
+        <button class="nav-sub-item" onclick="showDetail('cash-out')">Вынос денег</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 4 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(4); toggleChapter(this)" data-ch="4">
+        <div class="ch-dot" style="background:var(--c4)"></div>
+        <span>4. Товар</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-4">
+        <div class="nav-sub-section">4.1 Поиск</div>
+        <button class="nav-sub-item" onclick="showDetail('search-barcode')">По штрих-коду</button>
+        <button class="nav-sub-item" onclick="showDetail('search-code')">По коду</button>
+        <button class="nav-sub-item" onclick="showDetail('search-name')">По названию</button>
+        <button class="nav-sub-item" onclick="showDetail('search-secondary')">Вторичные способы</button>
+        <div class="nav-sub-section">4.2–4.4</div>
+        <button class="nav-sub-item" onclick="showDetail('delete-item')">Удаление товара</button>
+        <button class="nav-sub-item" onclick="showDetail('price-info')">Информация о цене</button>
+        <button class="nav-sub-item" onclick="showDetail('quantity')">Количество товара</button>
+        <button class="nav-sub-item" onclick="showDetail('scales')">Работа с весами</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 5 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(5); toggleChapter(this)" data-ch="5">
+        <div class="ch-dot" style="background:var(--c5)"></div>
+        <span>5. Скидки и бонусы</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-5">
+        <button class="nav-sub-item" onclick="showDetail('price-cat')">Смена ценовой категории</button>
+        <button class="nav-sub-item" onclick="showDetail('discount-cashier')">Скидка кассира</button>
+        <button class="nav-sub-item" onclick="showDetail('discount-manual')">Изменение цены вручную</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 6 -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showChapter(6); toggleChapter(this)" data-ch="6">
+        <div class="ch-dot" style="background:var(--c6)"></div>
+        <span>6. Оплата</span>
+        <span class="ch-arrow">▶</span>
+      </button>
+      <div class="nav-sub" id="sub-6">
+        <button class="nav-sub-item" onclick="showDetail('pay-cash')">Наличными</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-card')">Банковской картой</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-cert')">Сертификатами</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-coupon')">Талонами на питание</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-bonus')">Бонусами</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-partial')">Частичная оплата</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-return')">Оплата по возврату</button>
+        <button class="nav-sub-item" onclick="showDetail('pay-cashback')">Выдача наличных (cashback)</button>
+      </div>
+    </div>
+
+    <!-- DRIVE INFO -->
+    <div class="nav-chapter">
+      <button class="nav-chapter-btn" onclick="showDriveInfo(); toggleChapter(this)" data-ch="drive">
+        <div class="ch-dot" style="background:#f85149"></div>
+        <span>📁 Остальные модули</span>
+      </button>
+    </div>
+
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════════ CONTENT ═══════════════════════════════ -->
+<main class="content" id="mainContent">
+
+  <!-- HOME -->
+  <div id="page-home">
+    <div style="padding:40px 40px 24px">
+      <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:8px">СПРУТ POS · Руководство пользователя</div>
+      <h1 style="font-size:26px;font-weight:700;margin-bottom:8px">База знаний: СПРУТ POS</h1>
+      <p style="font-size:13px;color:var(--text2);max-width:600px;line-height:1.6">Структурированное руководство по кассовому терминалу СПРУТ POS. Выберите раздел ниже или используйте навигацию слева.</p>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <span style="font-size:11px;padding:3px 10px;border-radius:4px;background:rgba(47,129,247,0.1);border:1px solid rgba(47,129,247,0.25);color:var(--accent);font-family:'JetBrains Mono',monospace">6 разделов</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:4px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--green);font-family:'JetBrains Mono',monospace">80+ тем</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:4px;background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.25);color:var(--purple);font-family:'JetBrains Mono',monospace">Кассир / Администратор / IT</span>
+      </div>
+    </div>
+
+    <div class="home-grid" style="padding:0 40px">
+
+      <button class="chapter-card" style="--card-c:var(--c1)" onclick="showChapter(1)">
+        <div class="card-num">ГЛАВА 01</div>
+        <div class="card-name">Интерфейс</div>
+        <div class="card-count">7 элементов интерфейса · настройки</div>
+        <div class="card-topics">
+          <span class="card-topic">Оболочка Desktop</span>
+          <span class="card-topic">Окно оплаты</span>
+          <span class="card-topic">Реестр</span>
+          <span class="card-topic">Язык</span>
+        </div>
+      </button>
+
+      <button class="chapter-card" style="--card-c:var(--c2)" onclick="showChapter(2)">
+        <div class="card-num">ГЛАВА 02</div>
+        <div class="card-name">Сеанс работы</div>
+        <div class="card-count">Запуск · смена · авторизация</div>
+        <div class="card-topics">
+          <span class="card-topic">Открытие смены</span>
+          <span class="card-topic">Z-отчёт</span>
+          <span class="card-topic">X-отчёт</span>
+          <span class="card-topic">Закрытие</span>
+        </div>
+      </button>
+
+      <button class="chapter-card" style="--card-c:var(--c3)" onclick="showChapter(3)">
+        <div class="card-num">ГЛАВА 03</div>
+        <div class="card-name">Кассовые операции</div>
+        <div class="card-count">Продажи · возврат · инкассация</div>
+        <div class="card-topics">
+          <span class="card-topic">Продажа</span>
+          <span class="card-topic">Алкоголь</span>
+          <span class="card-topic">Возврат</span>
+          <span class="card-topic">Мягкий чек</span>
+        </div>
+      </button>
+
+      <button class="chapter-card" style="--card-c:var(--c4)" onclick="showChapter(4)">
+        <div class="card-num">ГЛАВА 04</div>
+        <div class="card-name">Товар</div>
+        <div class="card-count">Поиск · удаление · цена · вес</div>
+        <div class="card-topics">
+          <span class="card-topic">Штрих-код</span>
+          <span class="card-topic">По названию</span>
+          <span class="card-topic">Весы</span>
+          <span class="card-topic">Количество</span>
+        </div>
+      </button>
+
+      <button class="chapter-card" style="--card-c:var(--c5)" onclick="showChapter(5)">
+        <div class="card-num">ГЛАВА 05</div>
+        <div class="card-name">Скидки и бонусы</div>
+        <div class="card-count">Ценовые категории · скидки кассира</div>
+        <div class="card-topics">
+          <span class="card-topic">Уценка</span>
+          <span class="card-topic">Скидка кассира</span>
+          <span class="card-topic">Цена вручную</span>
+        </div>
+      </button>
+
+      <button class="chapter-card" style="--card-c:var(--c6)" onclick="showChapter(6)">
+        <div class="card-num">ГЛАВА 06</div>
+        <div class="card-name">Оплата</div>
+        <div class="card-count">11 видов оплаты</div>
+        <div class="card-topics">
+          <span class="card-topic">Наличные</span>
+          <span class="card-topic">Карта</span>
+          <span class="card-topic">Бонусы</span>
+          <span class="card-topic">Талоны</span>
+          <span class="card-topic">Cashback</span>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- Quick ref table -->
+    <div style="padding:32px 40px 40px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;font-family:'JetBrains Mono',monospace">Быстрый доступ по роли</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:10px;font-family:'JetBrains Mono',monospace">🛒 КАССИР</div>
+          <div style="font-size:12px;color:var(--text2);line-height:2">
+            <div style="cursor:pointer;color:var(--text2)" onclick="showDetail('auth')">→ Авторизация</div>
+            <div style="cursor:pointer" onclick="showDetail('shift-open')">→ Открытие смены</div>
+            <div style="cursor:pointer" onclick="showDetail('sale-normal')">→ Продажа товара</div>
+            <div style="cursor:pointer" onclick="showDetail('return-same')">→ Возврат</div>
+            <div style="cursor:pointer" onclick="showDetail('pay-cash')">→ Оплата</div>
+            <div style="cursor:pointer" onclick="showDetail('shift-close')">→ Закрытие смены</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;font-family:'JetBrains Mono',monospace">🏪 АДМИНИСТРАТОР</div>
+          <div style="font-size:12px;color:var(--text2);line-height:2">
+            <div style="cursor:pointer" onclick="showDetail('cash-control')">→ Контроль наличности</div>
+            <div style="cursor:pointer" onclick="showDetail('reports')">→ X/Z отчёты</div>
+            <div style="cursor:pointer" onclick="showDetail('cash-in')">→ Внос / вынос денег</div>
+            <div style="cursor:pointer" onclick="showDetail('discount-cashier')">→ Скидки</div>
+            <div style="cursor:pointer" onclick="showDetail('return-no')">→ Возврат без чека</div>
+            <div style="cursor:pointer" onclick="showDetail('shift-close')">→ Z-отчёт</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;color:var(--purple);font-weight:600;margin-bottom:10px;font-family:'JetBrains Mono',monospace">💻 IT / НАСТРОЙКА</div>
+          <div style="font-size:12px;color:var(--text2);line-height:2">
+            <div style="cursor:pointer" onclick="showDetail('desktop')">→ Оболочка Desktop</div>
+            <div style="cursor:pointer" onclick="showDetail('hw-check')">→ Проверка оборудования</div>
+            <div style="cursor:pointer" onclick="showDetail('interface-control')">→ Настройки интерфейса</div>
+            <div style="cursor:pointer" onclick="showDetail('language')">→ Язык системы</div>
+            <div style="cursor:pointer" onclick="showDetail('scales')">→ Весы</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAPTERS (generated) -->
+  <div class="chapter-page" id="ch-1">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c1);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 1</div>
+      <h2 style="font-size:20px;font-weight:700">Интерфейс СПРУТ POS</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">Элементы экрана, окна, настройки отображения</p>
+    </div>
+
+    <div class="section-block" id="s1-1">
+      <div class="section-header" onclick="toggleSection('s1-1')">
+        <div class="section-num" style="color:var(--c1)">1.1</div>
+        <div class="section-name">Элементы интерфейса</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('desktop')"><div class="topic-bullet">●</div>Оболочка СПРУТ POS Desktop</div>
+          <div class="topic-item" onclick="showDetail('login-window')"><div class="topic-bullet">●</div>Окно регистрации</div>
+          <div class="topic-item" onclick="showDetail('main-window')"><div class="topic-bullet">●</div>Основное окно POS (заголовок + список)</div>
+          <div class="topic-item" onclick="showDetail('search-window')"><div class="topic-bullet">●</div>Окно поиска товара / клиента</div>
+          <div class="topic-item" onclick="showDetail('registry-window')"><div class="topic-bullet">●</div>Окно реестра документов</div>
+          <div class="topic-item" onclick="showDetail('payment-window')"><div class="topic-bullet">●</div>Окно оплаты</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--accent);border-color:rgba(47,129,247,0.3);background:rgba(47,129,247,0.08)">Все роли</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="s1-2">
+      <div class="section-header" onclick="toggleSection('s1-2')">
+        <div class="section-num" style="color:var(--c1)">1.2–1.4</div>
+        <div class="section-name">Управление и настройка интерфейса</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('interface-control')"><div class="topic-bullet">●</div>Управление интерфейсом</div>
+          <div class="topic-item" onclick="showDetail('language')"><div class="topic-bullet">●</div>Управление языком интерфейса</div>
+          <div class="topic-item" onclick="showDetail('interface-options')"><div class="topic-bullet">●</div>Опции настройки интерфейса</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--purple);border-color:rgba(188,140,255,0.3);background:rgba(188,140,255,0.08)">IT-специалист</span>
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-page" id="ch-2">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 2</div>
+      <h2 style="font-size:20px;font-weight:700">Сеанс работы</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">Запуск, авторизация, кассовая смена, отчёты</p>
+    </div>
+
+    <div class="section-block" id="s2-1">
+      <div class="section-header" onclick="toggleSection('s2-1')">
+        <div class="section-num" style="color:var(--c2)">2.1–2.4</div>
+        <div class="section-name">Запуск и авторизация</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('launch')"><div class="topic-bullet">●</div>Запуск ПОС</div>
+          <div class="topic-item" onclick="showDetail('auth')"><div class="topic-bullet">●</div>Авторизация: ввод логина/пароля</div>
+          <div class="topic-item" onclick="showDetail('auth')"><div class="topic-bullet">●</div>Авторизация: сканирование карточки</div>
+          <div class="topic-item" onclick="showDetail('auth')"><div class="topic-bullet">●</div>Смарт-карт считыватель</div>
+          <div class="topic-item" onclick="showDetail('hw-check')"><div class="topic-bullet">●</div>Автопроверка оборудования (ФП)</div>
+          <div class="topic-item" onclick="showDetail('hw-check')"><div class="topic-bullet">●</div>Автопроверка лицензии</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--green);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Кассир</span>
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="s2-5">
+      <div class="section-header" onclick="toggleSection('s2-5')">
+        <div class="section-num" style="color:var(--c2)">2.5</div>
+        <div class="section-name">Кассовая смена</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">2.5.1–2.5.2</span>Открытие смены</div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Открытие смены</div>
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Печать 0-чека · проверка времени</div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">2.5.3</span>Длительность смены</div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('shift-duration')"><div class="topic-bullet">●</div>Контроль длительности</div>
+            <div class="topic-item" onclick="showDetail('shift-duration')"><div class="topic-bullet">●</div>Предупреждение об окончании смены</div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">2.5.4</span>Контроль наличности</div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('cash-control')"><div class="topic-bullet">●</div>X-отчёт</div>
+            <div class="topic-item" onclick="showDetail('cash-control')"><div class="topic-bullet">●</div>Сумма денег в кассе</div>
+            <div class="topic-item" onclick="showDetail('cash-control')"><div class="topic-bullet">●</div>Коррекция суммы</div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">2.5.5–2.5.8</span>Управление сменой</div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Реестр незакрытых чеков</div>
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Смена обслуживающего</div>
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Временный выход из ПОС</div>
+            <div class="topic-item" onclick="showDetail('shift-open')"><div class="topic-bullet">●</div>Подтверждение операций другим пользователем</div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">2.5.9</span>Закрытие смены</div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('shift-close')"><div class="topic-bullet">●</div>Авто-закрытие после Z-отчёта</div>
+            <div class="topic-item" onclick="showDetail('shift-close')"><div class="topic-bullet">●</div>Ручное закрытие</div>
+            <div class="topic-item" onclick="showDetail('shift-close')"><div class="topic-bullet">●</div>Закрытие с деньгами / отложенными чеками</div>
+            <div class="topic-item" onclick="showDetail('shift-close')"><div class="topic-bullet">●</div>Контроль по времени</div>
+            <div class="topic-item" onclick="showDetail('shift-close')"><div class="topic-bullet">●</div>Сверка итогов по банк. терминалу</div>
+            <div class="topic-item" onclick="showDetail('reports')"><div class="topic-bullet">●</div>Z-отчёт / X-отчёт / Отчёт за день</div>
+          </div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--green);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Кассир</span>
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+          <span class="role-chip" style="color:var(--accent);border-color:rgba(47,129,247,0.3);background:rgba(47,129,247,0.08)">Директор</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-page" id="ch-3">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c3);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 3</div>
+      <h2 style="font-size:20px;font-weight:700">Кассовые операции</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">Продажи, возвраты, управление наличными</p>
+    </div>
+
+    <div class="section-block" id="s3-1">
+      <div class="section-header" onclick="toggleSection('s3-1')">
+        <div class="section-num" style="color:var(--c3)">3.1</div>
+        <div class="section-name">Продажи</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('sale-normal')"><div class="topic-bullet">●</div>Обычный режим работы ПОС</div>
+          <div class="topic-item" onclick="showDetail('sale-normal')"><div class="topic-bullet">●</div>Продажа товаров</div>
+          <div class="topic-item" onclick="showDetail('sale-alcohol')"><div class="topic-bullet">●</div>Алкогольно-табачные товары</div>
+          <div class="topic-item" onclick="showDetail('sale-alcohol')"><div class="topic-bullet">●</div>Ограничение по возрасту / времени</div>
+          <div class="topic-item" onclick="showDetail('sale-alcohol')"><div class="topic-bullet">●</div>Контроль лицензий (розница / опт)</div>
+          <div class="topic-item" onclick="showDetail('sale-alcohol')"><div class="topic-bullet">●</div>Акцизные коды, алкоголь на разлив</div>
+          <div class="topic-item" onclick="showDetail('sale-cert')"><div class="topic-bullet">●</div>Продажа подарочных сертификатов</div>
+          <div class="topic-item" onclick="showDetail('sale-cert')"><div class="topic-bullet">●</div>Пополняемые сертификаты</div>
+          <div class="topic-item" onclick="showDetail('sale-multi')"><div class="topic-bullet">●</div>Продажа по нескольким компаниям</div>
+          <div class="topic-item" onclick="showDetail('sale-normal')"><div class="topic-bullet">●</div>Режим подготовки чека</div>
+          <div class="topic-item" onclick="showDetail('sale-soft')"><div class="topic-bullet">●</div>Режим мягкого чека</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--green);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Кассир</span>
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="s3-2">
+      <div class="section-header" onclick="toggleSection('s3-2')">
+        <div class="section-num" style="color:var(--c3)">3.2</div>
+        <div class="section-name">Возврат</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('return-same')"><div class="topic-bullet">●</div>Возврат по чеку с текущей кассы</div>
+          <div class="topic-item" onclick="showDetail('return-other')"><div class="topic-bullet">●</div>Возврат по чеку с другой кассы</div>
+          <div class="topic-item" onclick="showDetail('return-no')"><div class="topic-bullet">●</div>Возврат без чека</div>
+          <div class="topic-item" onclick="showDetail('return-same')"><div class="topic-bullet">●</div>Причина возврата</div>
+          <div class="topic-item" onclick="showDetail('return-same')"><div class="topic-bullet">●</div>Возврат всего чека / только товара</div>
+          <div class="topic-item" onclick="showDetail('return-same')"><div class="topic-bullet">●</div>Контроль даты чека продажи</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--green);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Кассир</span>
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор (без чека)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="s3-3">
+      <div class="section-header" onclick="toggleSection('s3-3')">
+        <div class="section-num" style="color:var(--c3)">3.3–3.4</div>
+        <div class="section-name">Управление наличными</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('cash-in')"><div class="topic-bullet">●</div>Внос денег: автоматически при открытии</div>
+          <div class="topic-item" onclick="showDetail('cash-in')"><div class="topic-bullet">●</div>Внос денег: вручную</div>
+          <div class="topic-item" onclick="showDetail('cash-out')"><div class="topic-bullet">●</div>Вынос денег из кассы</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-page" id="ch-4">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c4);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 4</div>
+      <h2 style="font-size:20px;font-weight:700">Товар</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">Поиск, удаление, цена, количество, весы</p>
+    </div>
+
+    <div class="section-block" id="s4-1">
+      <div class="section-header" onclick="toggleSection('s4-1')">
+        <div class="section-num" style="color:var(--c4)">4.1</div>
+        <div class="section-name">Поиск товара</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">Основные</span></div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('search-barcode')"><div class="topic-bullet">●</div>По штрих-коду (сканер / ручной ввод)</div>
+            <div class="topic-item" onclick="showDetail('search-code')"><div class="topic-bullet">●</div>По коду товара</div>
+            <div class="topic-item" onclick="showDetail('search-name')"><div class="topic-bullet">●</div>По названию — из каталога</div>
+            <div class="topic-item" onclick="showDetail('search-name')"><div class="topic-bullet">●</div>По названию — из группы (touch)</div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-title"><span class="subsection-num">Вторичные</span></div>
+          <div class="topic-grid">
+            <div class="topic-item" onclick="showDetail('search-secondary')"><div class="topic-bullet">●</div>По атрибутам товара</div>
+            <div class="topic-item" onclick="showDetail('search-secondary')"><div class="topic-bullet">●</div>По горячей клавише</div>
+            <div class="topic-item" onclick="showDetail('search-secondary')"><div class="topic-bullet">●</div>По отделу с товарами</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="s4-2">
+      <div class="section-header" onclick="toggleSection('s4-2')">
+        <div class="section-num" style="color:var(--c4)">4.2–4.4</div>
+        <div class="section-name">Удаление, цена, количество</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('delete-item')"><div class="topic-bullet">●</div>Удаление текущей позиции</div>
+          <div class="topic-item" onclick="showDetail('delete-item')"><div class="topic-bullet">●</div>Удаление через диалог</div>
+          <div class="topic-item" onclick="showDetail('delete-item')"><div class="topic-bullet">●</div>Отменить весь чек</div>
+          <div class="topic-item" onclick="showDetail('delete-item')"><div class="topic-bullet">●</div>Контроль лимита сторно</div>
+          <div class="topic-item" onclick="showDetail('price-info')"><div class="topic-bullet">●</div>Цена товара в чеке</div>
+          <div class="topic-item" onclick="showDetail('price-info')"><div class="topic-bullet">●</div>Запрос цены без ввода в чек</div>
+          <div class="topic-item" onclick="showDetail('quantity')"><div class="topic-bullet">●</div>Количество из штрих-кода</div>
+          <div class="topic-item" onclick="showDetail('quantity')"><div class="topic-bullet">●</div>Ввод количества вручную</div>
+          <div class="topic-item" onclick="showDetail('quantity')"><div class="topic-bullet">●</div>Увеличение / уменьшение количества</div>
+          <div class="topic-item" onclick="showDetail('quantity')"><div class="topic-bullet">●</div>Режим немедленного редактирования</div>
+          <div class="topic-item" onclick="showDetail('scales')"><div class="topic-bullet">●</div>Ввод с весов (авто / вручную)</div>
+          <div class="topic-item" onclick="showDetail('scales')"><div class="topic-bullet">●</div>Ошибки прикассовых весов</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-page" id="ch-5">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c5);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 5</div>
+      <h2 style="font-size:20px;font-weight:700">Скидки и бонусы</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">Ценовые категории, скидки кассира, ручное изменение цены</p>
+    </div>
+    <div class="section-block" id="s5-1">
+      <div class="section-header" onclick="toggleSection('s5-1')">
+        <div class="section-num" style="color:var(--c5)">5.1</div>
+        <div class="section-name">Управление ценой товара</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('price-cat')"><div class="topic-bullet">●</div>Смена ценовой категории (уценка, уровни)</div>
+          <div class="topic-item" onclick="showDetail('discount-cashier')"><div class="topic-bullet">●</div>Скидка на позицию (скидка кассира)</div>
+          <div class="topic-item" onclick="showDetail('discount-manual')"><div class="topic-bullet">●</div>Доп. скидка / изменение цены вручную</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--orange);border-color:rgba(210,153,34,0.3);background:rgba(210,153,34,0.08)">Администратор</span>
+          <span class="role-chip" style="color:var(--accent);border-color:rgba(47,129,247,0.3);background:rgba(47,129,247,0.08)">Директор (расширенные)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-page" id="ch-6">
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--c6);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">ГЛАВА 6</div>
+      <h2 style="font-size:20px;font-weight:700">Оплата</h2>
+      <p style="font-size:12px;color:var(--text2);margin-top:6px">11 видов оплаты: наличные, карта, бонусы, сертификаты, талоны</p>
+    </div>
+    <div class="section-block" id="s6-1">
+      <div class="section-header" onclick="toggleSection('s6-1')">
+        <div class="section-num" style="color:var(--c6)">6.1–6.11</div>
+        <div class="section-name">Все виды оплаты</div>
+        <div class="section-toggle">▶</div>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <div class="topic-item" onclick="showDetail('pay-cash')"><div class="topic-bullet">●</div>6.1 Оплата наличными</div>
+          <div class="topic-item" onclick="showDetail('pay-card')"><div class="topic-bullet">●</div>6.2 Оплата банковской картой</div>
+          <div class="topic-item" onclick="showDetail('pay-cert')"><div class="topic-bullet">●</div>6.3 Оплата сертификатами (полная / частичная)</div>
+          <div class="topic-item" onclick="showDetail('pay-coupon')"><div class="topic-bullet">●</div>6.4 Талоны на питание (ручной / электронный)</div>
+          <div class="topic-item" onclick="showDetail('pay-bonus')"><div class="topic-bullet">●</div>6.5 Оплата бонусами (полная / бонус до целого)</div>
+          <div class="topic-item" onclick="showDetail('pay-bonus')"><div class="topic-bullet">●</div>6.5 Копейки с/на бонусный счёт</div>
+          <div class="topic-item" onclick="showDetail('pay-partial')"><div class="topic-bullet">●</div>6.6 Частичная оплата (смешанная)</div>
+          <div class="topic-item" onclick="showDetail('pay-card')"><div class="topic-bullet">●</div>6.7 Оплата по нескольким компаниям</div>
+          <div class="topic-item" onclick="showDetail('pay-cash')"><div class="topic-bullet">●</div>6.8 Акционная оплата</div>
+          <div class="topic-item" onclick="showDetail('pay-return')"><div class="topic-bullet">●</div>6.9 Оплата по возврату</div>
+          <div class="topic-item" onclick="showDetail('pay-card')"><div class="topic-bullet">●</div>6.10 Запрет оплаты определённым типом</div>
+          <div class="topic-item" onclick="showDetail('pay-cashback')"><div class="topic-bullet">●</div>6.11 Выдача наличных при оплате картой (cashback)</div>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" style="color:var(--green);border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Кассир</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL PAGE -->
+  <div id="page-detail">
+    <div id="detail-content"></div>
+  </div>
+
+  <!-- DRIVE INFO PAGE -->
+  <div id="page-drive" style="display:none">
+    <div class="drive-info">
+      <h2>📁 Как подключить остальные модули СПРУТ</h2>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">Ваши <code style="font-family:'JetBrains Mono',monospace;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--orange)">.docx</code> файлы в папке Drive видны только как папки — Drive API не отдаёт содержимое Word/PDF файлов напрямую. Вот три способа решить это:</p>
+
+      <div class="drive-step">
+        <div class="drive-step-num">1</div>
+        <div class="drive-step-body">
+          <h4>✅ Рекомендуемый — конвертация в Google Docs (5 минут)</h4>
+          <p>Откройте папку <code>Справочное руководство ПС СПРУТ</code> на Drive → выделите все .docx файлы → правая кнопка → <strong>«Открыть с помощью → Google Документы»</strong>. Они сконвертируются в нативные Google Docs, после чего я смогу читать их содержимое через Drive API и добавить все разделы в этот хаб.</p>
+        </div>
+      </div>
+
+      <div class="drive-step">
+        <div class="drive-step-num">2</div>
+        <div class="drive-step-body">
+          <h4>📎 Загрузить файлы прямо в чат</h4>
+          <p>Скачайте нужные .docx файлы из Drive и прикрепите их сюда (до 5 файлов за раз). Я прочитаю каждый и добавлю его содержимое в этот хаб отдельными разделами. Уже добавлен: <code>Руководство пользователя СПРУТ POS.docx</code>.</p>
+        </div>
+      </div>
+
+      <div class="drive-step">
+        <div class="drive-step-num">3</div>
+        <div class="drive-step-body">
+          <h4>📋 Список файлов вручную</h4>
+          <p>Если конвертировать неудобно — просто напишите мне <strong>названия всех файлов</strong> в каждой папке (1 Основные модули, 2 Анализ, 3 Справочники, 4 Сервис). Этого достаточно чтобы построить полную архитектуру хаба, а содержимое заполним позже.</p>
+        </div>
+      </div>
+
+      <div class="drive-step">
+        <div class="drive-step-num">4</div>
+        <div class="drive-step-body">
+          <h4>🗂 Структура когда все модули будут загружены</h4>
+          <p>Этот хаб будет расширен разделами: <strong>Основные модули</strong> (товародвижение, приходы, ценники) · <strong>Анализ</strong> (отчёты, себестоимость, ABC) · <strong>Справочники</strong> (номенклатура, контрагенты) · <strong>Сервис</strong> (права, настройки, обмены) · <strong>Приложения</strong> (конфигурационные файлы) · <strong>Руководства по должностям</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── STATE ────────────────────────────────
+let currentPage = 'home';
+
+// ─── NAVIGATION ──────────────────────────
+function goHome() {
+  hideAll();
+  document.getElementById('page-home').style.display = 'block';
+  currentPage = 'home';
+  setActiveNav(null);
+}
+
+function showChapter(n) {
+  hideAll();
+  const el = document.getElementById('ch-'+n);
+  if (el) { el.style.display = 'block'; el.classList.add('active'); }
+  currentPage = 'ch-'+n;
+}
+
+function showDriveInfo() {
+  hideAll();
+  document.getElementById('page-drive').style.display = 'block';
+}
+
+function hideAll() {
+  document.getElementById('page-home').style.display = 'none';
+  document.getElementById('page-detail').style.display = 'none';
+  document.getElementById('page-drive').style.display = 'none';
+  document.querySelectorAll('.chapter-page').forEach(p => {
+    p.style.display = 'none'; p.classList.remove('active');
+  });
+}
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function toggleChapter(btn) {
+  const ch = btn.dataset.ch;
+  const sub = document.getElementById('sub-'+ch);
+  document.querySelectorAll('.nav-chapter-btn').forEach(b => {
+    if (b !== btn) { b.classList.remove('open','active'); }
+    const s = document.getElementById('sub-'+b.dataset.ch);
+    if (s && b !== btn) s.classList.remove('open');
+  });
+  btn.classList.toggle('open');
+  btn.classList.add('active');
+  if (sub) sub.classList.toggle('open');
+
+  // sync sub-item active
+  document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+}
+
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+}
+
+// ─── DETAIL CONTENT MAP ───────────────────
+const details = {
+  'desktop': {
+    title: 'Оболочка СПРУТ POS Desktop',
+    ch: '1.1.1',
+    color: 'var(--c1)',
+    steps: [
+      { t: 'Запуск оболочки', d: '<strong>СПРУТ POS Desktop</strong> — контейнерная среда, внутри которой работает кассовый терминал. Запускается отдельным ярлыком на рабочем столе.' },
+      { t: 'Роль оболочки', d: 'Обеспечивает полноэкранный режим, блокирует доступ к ОС во время работы кассы, управляет обновлениями.' },
+    ],
+    info: 'Оболочка — первый экран при включении кассового компьютера. Она должна запускаться автоматически при старте ОС.',
+  },
+  'auth': {
+    title: 'Авторизация пользователя',
+    ch: '2.2',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'Способ 1: Ручной ввод', d: 'Введите <strong>логин</strong> и <strong>пароль</strong> с клавиатуры в окне регистрации.' },
+      { t: 'Способ 2: Карточка (логин+пароль)', d: 'Поднесите карточку к считывателю — система автоматически заполнит оба поля.' },
+      { t: 'Способ 2: Карточка (только пароль)', d: 'Сначала введите логин вручную, затем отсканируйте карточку для пароля.' },
+      { t: 'Способ 3: Смарт-карт считыватель', d: 'Вставьте смарт-карту в считыватель — авторизация происходит автоматически без ввода данных.' },
+    ],
+    warning: 'Если карточка содержит только логин — пароль нужно ввести вручную. Проверьте настройку карточки у администратора.',
+  },
+  'shift-open': {
+    title: 'Открытие кассовой смены',
+    ch: '2.5.1–2.5.2',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'Авторизация', d: 'Войдите в систему под своим логином и паролем.' },
+      { t: 'Открытие смены', d: 'Система предложит открыть смену — подтвердите действие.' },
+      { t: 'Печать 0-чека', d: 'Автоматически печатается нулевой чек — начало смены зафиксировано в ФП.' },
+      { t: 'Проверка времени', d: 'Проверьте дату и время на чеке. При расхождении: <strong>Меню → Установка даты и времени</strong>.' },
+      { t: 'Внос денег', d: 'Если требуется — внесите начальную сумму в кассу (автоматически или вручную).' },
+    ],
+    warning: 'Расхождение времени на чеке критично для ФНО! Исправьте через меню до начала продаж.',
+  },
+  'shift-close': {
+    title: 'Закрытие кассовой смены',
+    ch: '2.5.9',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'Проверка отложенных чеков', d: 'Перед закрытием убедитесь, что нет незакрытых/отложенных чеков через Реестр документов.' },
+      { t: 'Проверка наличности', d: 'Пересчитайте деньги в кассе. При необходимости — сверка с банковским терминалом.' },
+      { t: 'Способ 1: Авто-закрытие', d: 'После печати Z-отчёта смена закрывается автоматически.' },
+      { t: 'Способ 2: Ручное закрытие', d: '<strong>Главное меню → Закрытие смены</strong>.' },
+      { t: 'Z-отчёт', d: 'Фискальный документ — подтверждает закрытие смены. Хранить обязательно.' },
+    ],
+    warning: 'Смена не закроется, если есть деньги в кассе сверх нормы или отложенные чеки — требуется подтверждение администратора.',
+  },
+  'reports': {
+    title: 'X-отчёт и Z-отчёт',
+    ch: '2.5.9',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'X-отчёт', d: '<strong>Промежуточный отчёт</strong> — не закрывает смену. Показывает текущие итоги продаж, наличность. Можно снимать несколько раз за смену.' },
+      { t: 'Z-отчёт', d: '<strong>Фискальный отчёт закрытия</strong> — закрывает смену, обнуляет счётчики ФП. Снимается один раз в конце смены.' },
+      { t: 'Копия Z-отчёта', d: 'В меню доступна печать копии последнего Z-отчёта (без закрытия смены).' },
+      { t: 'Отчёт по операциям за день', d: 'Сводка всех операций: продажи, возвраты, внос/вынос. Для директора / администратора.' },
+    ],
+    info: 'X-отчёт = контроль. Z-отчёт = закрытие. Не путайте — Z-отчёт необратим.',
+  },
+  'sale-normal': {
+    title: 'Обычная продажа товара',
+    ch: '3.1.1',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Поиск товара', d: 'Отсканируйте штрих-код или найдите товар по коду/названию.' },
+      { t: 'Проверка цены', d: 'Цена отобразится в списке товаров. При необходимости уточните через запрос цены.' },
+      { t: 'Количество', d: 'По умолчанию — 1 шт. Измените при необходимости до или после добавления.' },
+      { t: 'Добавление позиций', d: 'Продолжайте сканировать товары — они добавляются в список чека.' },
+      { t: 'Переход к оплате', d: 'Нажмите <strong>«Оплата»</strong> — откроется окно выбора способа оплаты.' },
+      { t: 'Завершение', d: 'После оплаты — печать чека, сдача (для наличных).' },
+    ],
+  },
+  'sale-alcohol': {
+    title: 'Продажа алкогольно-табачных товаров',
+    ch: '3.1.1',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Ограничение по возрасту', d: 'Система запросит подтверждение возраста покупателя (18+). Кассир обязан проверить документ.' },
+      { t: 'Ограничение по времени', d: 'Продажа алкоголя заблокирована в ночные часы согласно законодательству РК.' },
+      { t: 'Проверка лицензии', d: 'Контроль наличия розничной/оптовой лицензии у компании-продавца и клиента.' },
+      { t: 'Акцизные коды', d: 'Для крепкого алкоголя — обязательное сканирование акцизной марки.' },
+      { t: 'Алкоголь на разлив', d: 'Специальный режим: ввод объёма в мл, привязка к разливному оборудованию.' },
+      { t: 'Алкогольные комплекты', d: 'При продаже набора (бутылка + стакан) — каждый алкогольный компонент сканируется отдельно.' },
+    ],
+    warning: 'Отказ в продаже алкоголя несовершеннолетним — обязанность кассира. При сомнении в возрасте — требовать документ.',
+  },
+  'return-same': {
+    title: 'Возврат по чеку (текущая касса)',
+    ch: '3.2.1',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Вызов операции возврата', d: 'Меню → Возврат или нажмите соответствующую функциональную клавишу.' },
+      { t: 'Поиск чека', d: 'Введите номер чека или отсканируйте штрих-код с чека.' },
+      { t: 'Выбор товара', d: 'Выберите: <strong>весь чек</strong> или <strong>только нужный товар</strong>.' },
+      { t: 'Причина возврата', d: 'Выберите причину из списка (обязательно).' },
+      { t: 'Контроль даты', d: 'Система проверяет дату чека — возврат возможен только в установленные сроки.' },
+      { t: 'Оплата возврата', d: 'Выдача денег тем же способом, которым была произведена оплата.' },
+    ],
+  },
+  'return-no': {
+    title: 'Возврат без чека',
+    ch: '3.2.3',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Права', d: 'Операция требует <strong>прав администратора</strong>. Кассир не может выполнить самостоятельно.' },
+      { t: 'Поиск товара', d: 'Найдите товар по штрих-коду или коду.' },
+      { t: 'Причина возврата', d: 'Обязательно указать причину — для отчётности.' },
+      { t: 'Подтверждение', d: 'Администратор подтверждает операцию своим PIN-кодом или карточкой.' },
+    ],
+    warning: 'Возврат без чека — рисковая операция. Все такие возвраты отображаются в отчёте для контроля директором.',
+  },
+  'search-barcode': {
+    title: 'Поиск товара по штрих-коду',
+    ch: '4.1.1',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Сканирование', d: 'Наведите сканер на штрих-код товара — товар добавляется автоматически.' },
+      { t: 'Ручной ввод', d: 'Введите цифры штрих-кода вручную с клавиатуры, нажмите Enter.' },
+      { t: 'Количество в штрих-коде', d: 'Некоторые штрих-коды весовых товаров содержат количество — система считывает его автоматически.' },
+    ],
+    info: 'Штрих-код весового товара (EAN-13 начинается с 2 или 02) автоматически подставляет вес в граммах как количество.',
+  },
+  'scales': {
+    title: 'Работа с прикассовыми весами',
+    ch: '4.4.2',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Авторежим', d: 'Положите товар на весы → система автоматически считывает вес и добавляет его как количество к выбранному товару.' },
+      { t: 'Ручной режим', d: 'Взвесьте товар → вручную введите показание весов в поле количества.' },
+      { t: 'Ошибки весов', d: 'При ошибке соединения — перезапустите COM-порт весов через <strong>Сервис → Оборудование</strong>.' },
+    ],
+    warning: 'Перед смеой убедитесь в калибровке весов (нулевое показание без товара). Нарушение метрологии — административная ответственность.',
+  },
+  'pay-cash': {
+    title: 'Оплата наличными',
+    ch: '6.1',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Открытие окна оплаты', d: 'Нажмите <strong>«Оплата»</strong> или клавишу F10 после формирования чека.' },
+      { t: 'Выбор "Наличные"', d: 'Нажмите кнопку <strong>«Наличные»</strong>.' },
+      { t: 'Ввод суммы', d: 'Введите сумму, полученную от покупателя. Система автоматически рассчитает сдачу.' },
+      { t: 'Подтверждение', d: 'Нажмите Enter — касса открывается, печатается чек.' },
+      { t: 'Сдача', d: 'Сумма сдачи отображается на экране и на дисплее покупателя.' },
+    ],
+  },
+  'pay-card': {
+    title: 'Оплата банковской картой',
+    ch: '6.2',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Выбор оплаты картой', d: 'В окне оплаты нажмите <strong>«Карта»</strong>.' },
+      { t: 'Терминал', d: 'Сумма автоматически передаётся на банковский терминал. Покупатель прикладывает карту/телефон.' },
+      { t: 'Ожидание подтверждения', d: 'Дождитесь ответа от банка — «Одобрено» или «Отказано».' },
+      { t: 'Печать чека', d: 'При одобрении — печатается кассовый чек и слип терминала.' },
+      { t: 'Cashback (6.11)', d: 'Если настроено — покупатель может запросить выдачу наличных при оплате картой.' },
+    ],
+    warning: 'При «Отказе» — попросите другую карту или предложите оплату наличными. Не пытайтесь провести повторно без согласия покупателя.',
+  },
+  'pay-bonus': {
+    title: 'Оплата бонусами',
+    ch: '6.5',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Идентификация клиента', d: 'Отсканируйте карту лояльности или введите номер телефона клиента.' },
+      { t: 'Полная оплата бонусами', d: 'Если баланс бонусов ≥ сумме чека — можно оплатить полностью.' },
+      { t: 'Бонус до целого', d: 'Округление суммы к ближайшему целому за счёт бонусов покупателя.' },
+      { t: 'Копейки с бонусного счёта', d: 'Дробная часть суммы списывается с бонусного счёта автоматически.' },
+      { t: 'Копейки на бонусный счёт', d: 'Сдача в копейках зачисляется на бонусный счёт вместо выдачи наличными.' },
+    ],
+  },
+  'pay-cert': {
+    title: 'Оплата сертификатами',
+    ch: '6.3',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Выбор оплаты сертификатом', d: 'В окне оплаты нажмите <strong>«Сертификат»</strong>.' },
+      { t: 'Сканирование / ввод кода', d: 'Отсканируйте штрих-код сертификата или введите код вручную.' },
+      { t: 'Полная оплата', d: 'Сумма сертификата ≥ чеку — чек закрывается, остаток на сертификате сгорает.' },
+      { t: 'Частичная оплата', d: 'Сумма сертификата < чека — доплатите разницу другим способом (наличные/карта).' },
+      { t: 'Несколько сертификатов', d: 'Можно применить несколько сертификатов последовательно.' },
+    ],
+  },
+  'pay-partial': {
+    title: 'Частичная (смешанная) оплата',
+    ch: '6.6',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Первый способ оплаты', d: 'Введите частичную сумму первым способом (например, часть наличными).' },
+      { t: 'Второй способ', d: 'Система покажет остаток — оплатите картой, бонусами или другим доступным способом.' },
+      { t: 'Закрытие чека', d: 'После полного покрытия суммы — чек закрывается автоматически.' },
+    ],
+    info: 'Можно комбинировать: наличные + карта, сертификат + карта, бонусы + наличные и т.д.',
+  },
+  'cash-control': {
+    title: 'Контроль наличности в кассе',
+    ch: '2.5.4',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'X-отчёт', d: 'Снимите X-отчёт для сверки: показывает сумму по всем операциям без закрытия смены.' },
+      { t: 'Пересчёт', d: 'Физически пересчитайте купюры в кассовом ящике.' },
+      { t: 'Коррекция суммы', d: 'При расхождении — используйте <strong>«Коррекция суммы денег в кассе»</strong> с указанием причины.' },
+      { t: 'Реестр документов', d: 'Просмотрите все незакрытые/отложенные чеки через Реестр.' },
+    ],
+  },
+  'hw-check': {
+    title: 'Автоматическая проверка оборудования',
+    ch: '2.3–2.4',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'Проверка ФП', d: 'При запуске ПОС автоматически проверяется связь с фискальным принтером (ФП/ККТ).' },
+      { t: 'Проверка лицензии', d: 'Проверяется действительность лицензии программного комплекса СПРУТ.' },
+      { t: 'Сообщения об ошибках', d: 'При ошибке — система выводит код и описание. Запишите сообщение и передайте IT-специалисту.' },
+    ],
+    warning: 'Если ФП не найден — продажи невозможны. Вызовите IT-поддержку через OKDesk.',
+  },
+  'delete-item': {
+    title: 'Удаление товара из чека',
+    ch: '4.2',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Удаление текущей позиции', d: 'Выберите позицию в списке → нажмите <strong>«Удалить»</strong> или клавишу Delete.' },
+      { t: 'Удаление через диалог', d: 'Через меню → Удалить позицию → подтверждение.' },
+      { t: 'Отменить весь чек', d: '<strong>Меню → Отменить чек</strong> — удаляет все позиции. Требует подтверждения.' },
+      { t: 'Контроль лимита сторно', d: 'Система отслеживает количество удалений за смену. При превышении лимита — требуется подтверждение администратора.' },
+    ],
+    warning: 'Удаление позиций фиксируется в журнале операций. Администратор видит все сторно в отчёте.',
+  },
+  'quantity': {
+    title: 'Количество товара',
+    ch: '4.4',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Ввод количества ДО добавления', d: 'Введите число с клавиатуры → затем отсканируйте товар.' },
+      { t: 'Изменение после добавления', d: 'Выберите позицию в чеке → нажмите <strong>«Количество»</strong> → введите новое значение.' },
+      { t: 'Увеличение (+ кнопка)', d: 'Быстрое увеличение на 1 единицу.' },
+      { t: 'Уменьшение (- кнопка)', d: 'Уменьшение на 1 единицу с подтверждением (защита от случайного нажатия).' },
+      { t: 'Режим немедленного редактирования', d: 'При повторном сканировании того же товара — количество увеличивается автоматически.' },
+    ],
+  },
+  'price-info': {
+    title: 'Информация о цене товара',
+    ch: '4.3',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Цена в чеке', d: 'После добавления товара — цена и сумма отображаются в строке позиции.' },
+      { t: 'Запрос цены без чека', d: 'Сканируйте штрих-код <strong>не в режиме продажи</strong> — система покажет цену без добавления в чек.' },
+    ],
+    info: 'Используйте запрос цены для ответа на вопросы покупателей о стоимости товара без нарушения текущего чека.',
+  },
+  'price-cat': {
+    title: 'Смена ценовой категории',
+    ch: '5.1',
+    color: 'var(--c5)',
+    steps: [
+      { t: 'Выбор товара', d: 'Добавьте товар в чек.' },
+      { t: 'Смена категории', d: '<strong>Меню → Скидки → Ценовая категория</strong> — выберите нужный уровень (уценка, дк и т.д.).' },
+      { t: 'Применение', d: 'Цена товара пересчитается согласно выбранной категории.' },
+    ],
+  },
+  'discount-cashier': {
+    title: 'Скидка кассира на позицию',
+    ch: '5.1',
+    color: 'var(--c5)',
+    steps: [
+      { t: 'Права', d: 'Требуются права «Скидка кассира» — назначаются администратором.' },
+      { t: 'Выбор позиции', d: 'Выберите товар в чеке.' },
+      { t: 'Ввод скидки', d: 'Укажите размер скидки в % или в сумме.' },
+      { t: 'Подтверждение', d: 'При превышении лимита скидки — потребуется подтверждение администратора.' },
+    ],
+    warning: 'Все скидки кассира фиксируются в отчёте и доступны для проверки директором.',
+  },
+  'pay-coupon': {
+    title: 'Оплата талонами на питание',
+    ch: '6.4',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Ручной талон', d: 'Введите номинал и количество бумажных талонов вручную.' },
+      { t: 'Электронный талон', d: 'Отсканируйте QR-код или штрих-код электронного талона — система автоматически проверит и применит.' },
+    ],
+    info: 'Талоны на питание — корпоративный benefit. Принимаются только от сотрудников компании-партнёра.',
+  },
+  'pay-return': {
+    title: 'Оплата по возврату',
+    ch: '6.9',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Возврат средств', d: 'После оформления возврата — система формирует чек возврата.' },
+      { t: 'Способ возврата денег', d: 'Возврат производится тем же способом, каким была оплата: наличные → наличными, карта → на карту.' },
+      { t: 'Ограничения', d: 'Возврат на карту возможен только при наличии терминала и разрешения банка.' },
+    ],
+  },
+  'pay-cashback': {
+    title: 'Выдача наличных при оплате картой (Cashback)',
+    ch: '6.11',
+    color: 'var(--c6)',
+    steps: [
+      { t: 'Условия', d: 'Функция доступна только если банковский терминал поддерживает cashback.' },
+      { t: 'Запрос покупателя', d: 'Покупатель запрашивает сумму cashback при оплате.' },
+      { t: 'Обработка', d: 'К сумме покупки добавляется запрошенная сумма — всё списывается с карты, кассир выдаёт наличные.' },
+    ],
+    warning: 'Cashback увеличивает итоговую сумму по карте. Убедитесь, что покупатель это понимает.',
+  },
+  'sale-cert': {
+    title: 'Продажа подарочных сертификатов',
+    ch: '3.1.1',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Продажа обычного сертификата', d: 'Найдите позицию «Сертификат» в каталоге → выберите номинал → добавьте в чек → оплатите.' },
+      { t: 'Продажа пополняемого сертификата', d: 'Выберите пополняемый сертификат → укажите сумму пополнения → система зачислит средства на карту.' },
+      { t: 'Проверка информации', d: 'Для проверки баланса сертификата — отсканируйте его в режиме «Запрос информации».' },
+    ],
+  },
+  'sale-soft': {
+    title: 'Режим мягкого чека',
+    ch: '3.1.4',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Включение', d: 'Активируйте режим через меню — чек переходит в статус «мягкий» (предварительный).' },
+      { t: 'Работа с мягким чеком', d: 'Добавляйте товары, изменяйте количество и цены. Чек не проводится фискально до подтверждения.' },
+      { t: 'Подтверждение', d: 'Финальное подтверждение переводит мягкий чек в обычный с фискальной регистрацией.' },
+      { t: 'Откладывание', d: 'Мягкий чек можно отложить и вернуться к нему позже через Реестр документов.' },
+    ],
+    info: 'Мягкий чек используется для предзаказов, обслуживания за столиком или ситуаций когда покупатель ещё выбирает.',
+  },
+  'search-name': {
+    title: 'Поиск товара по названию',
+    ch: '4.1.1',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'Из всего каталога', d: 'Нажмите F3 (или кнопку поиска) → введите часть названия → выберите из списка результатов.' },
+      { t: 'Из группы (touch-screen)', d: 'На сенсорном экране — выберите категорию/отдел → найдите товар в группе.' },
+    ],
+  },
+  'search-secondary': {
+    title: 'Вторичные способы поиска товара',
+    ch: '4.1.2',
+    color: 'var(--c4)',
+    steps: [
+      { t: 'По атрибутам', d: 'Поиск по дополнительным характеристикам товара (цвет, размер, производитель и т.д.).' },
+      { t: 'По горячей клавише', d: 'Некоторым товарам назначены горячие клавиши F1–F12 для быстрого доступа.' },
+      { t: 'По отделу', d: 'Выберите отдел/секцию → просмотрите список товаров этого отдела.' },
+    ],
+  },
+  'return-other': {
+    title: 'Возврат по чеку с другой кассы',
+    ch: '3.2.2',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Права', d: 'Требуются расширенные права — обычно администратор.' },
+      { t: 'Ввод номера чека', d: 'Введите номер чека с другой кассы — система найдёт его через общую базу.' },
+      { t: 'Дальнейшие шаги', d: 'Процедура аналогична возврату по своему чеку: выбор товара → причина → оплата возврата.' },
+    ],
+    warning: 'Доступность этой функции зависит от настройки прав и сетевой связи между кассами.',
+  },
+  'cash-in': {
+    title: 'Внос денег в кассу',
+    ch: '3.3',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Автоматически при открытии', d: 'Если настроен начальный остаток — система запросит подтверждение суммы при открытии смены.' },
+      { t: 'Ручной внос', d: '<strong>Меню → Внос денег</strong> → введите сумму → подтвердите → печатается документ.' },
+    ],
+    info: 'Все операции вноса фиксируются в Z-отчёте и доступны в отчёте по операциям за день.',
+  },
+  'cash-out': {
+    title: 'Вынос денег из кассы',
+    ch: '3.4',
+    color: 'var(--c3)',
+    steps: [
+      { t: 'Вызов операции', d: '<strong>Меню → Вынос денег</strong> → введите сумму → подтвердите.' },
+      { t: 'Документ', d: 'Система печатает документ изъятия — подпишите и передайте администратору/инкассатору.' },
+    ],
+    warning: 'Вынос денег доступен только администратору. Кассир не может выполнить самостоятельно.',
+  },
+  'discount-manual': {
+    title: 'Дополнительная скидка / изменение цены вручную',
+    ch: '5.1',
+    color: 'var(--c5)',
+    steps: [
+      { t: 'Права', d: 'Требуются права «Изменение цены вручную» — выше, чем у кассира.' },
+      { t: 'Выбор позиции', d: 'Выберите товар в чеке.' },
+      { t: 'Новая цена', d: 'Введите новую цену напрямую или укажите дополнительную скидку поверх базовой.' },
+    ],
+    warning: 'Ручное изменение цены фиксируется отдельно в отчёте — видно директору и службе безопасности.',
+  },
+  'launch': {
+    title: 'Запуск СПРУТ POS',
+    ch: '2.1',
+    color: 'var(--c2)',
+    steps: [
+      { t: 'Включение компьютера', d: 'Включите кассовый компьютер. Оболочка СПРУТ POS Desktop запустится автоматически.' },
+      { t: 'Ожидание загрузки', d: 'Дождитесь полной загрузки — на экране появится окно регистрации.' },
+      { t: 'Проверки', d: 'Автоматически проверяются: ФП, лицензия, связь с сервером.' },
+    ],
+  },
+  'login-window': { title: 'Окно регистрации', ch: '1.1.2', color: 'var(--c1)', steps: [{ t: 'Описание', d: 'Первый экран после запуска. Содержит поля логина и пароля, кнопку входа.' }] },
+  'main-window': { title: 'Основное окно СПРУТ POS', ch: '1.1.3', color: 'var(--c1)', steps: [{ t: 'Область заголовка', d: 'Отображает: текущего пользователя, номер смены, дату/время, статус ФП.' }, { t: 'Область списка товаров', d: 'Список позиций текущего чека с количеством, ценой и суммой. Итоговая сумма — в нижней части.' }] },
+  'search-window': { title: 'Окно поиска товара/клиента', ch: '1.1.4–1.1.5', color: 'var(--c1)', steps: [{ t: 'Поиск товара', d: 'Открывается по F3 — поле ввода + список результатов с ценами.' }, { t: 'Поиск клиента', d: 'Поиск по номеру карты лояльности или телефону.' }] },
+  'registry-window': { title: 'Окно реестра документов', ch: '1.1.6', color: 'var(--c1)', steps: [{ t: 'Назначение', d: 'Список всех документов смены: чеки, возвраты, отложенные чеки, операции с наличными.' }, { t: 'Доступ', d: 'Открывается из главного меню — используется для контроля и поиска нужного документа.' }] },
+  'payment-window': { title: 'Окно оплаты', ch: '1.1.7', color: 'var(--c1)', steps: [{ t: 'Структура', d: 'Итоговая сумма + кнопки видов оплаты (наличные, карта, бонусы, сертификат, талоны).' }, { t: 'Частичная оплата', d: 'Показывает остаток к оплате после применения первого способа.' }] },
+  'interface-control': { title: 'Управление интерфейсом', ch: '1.2', color: 'var(--c1)', steps: [{ t: 'Описание', d: 'Настройка расположения кнопок, горячих клавиш, видимости элементов под конкретную роль.' }] },
+  'language': { title: 'Управление языком интерфейса', ch: '1.3', color: 'var(--c1)', steps: [{ t: 'Смена языка', d: 'Меню → Настройки → Язык. Доступные языки зависят от конфигурации установки СПРУТ.' }], info: 'Поддерживаются: русский, казахский (уточните актуальный список у поставщика).' },
+  'interface-options': { title: 'Опции настройки интерфейса', ch: '1.4', color: 'var(--c1)', steps: [{ t: 'Описание', d: 'Расширенные параметры отображения: шрифты, цветовые схемы, режим touch-screen, отображение колонок в чеке.' }] },
+  'sale-multi': { title: 'Продажа по нескольким компаниям', ch: '3.1.2', color: 'var(--c3)', steps: [{ t: 'Назначение', d: 'Если торговая точка работает от нескольких юридических лиц — один чек может содержать товары разных компаний.' }, { t: 'Оплата', d: 'Каждая часть чека проводится фискально по своей компании.' }] },
+  'shift-duration': { title: 'Длительность смены', ch: '2.5.3', color: 'var(--c2)', steps: [{ t: 'Максимальная длительность', d: 'По требованиям ФНО — смена не может превышать 24 часа.' }, { t: 'Предупреждение', d: 'За N минут до истечения 24 часов система выдаёт предупреждение о необходимости закрыть смену.' }, { t: 'Принудительное закрытие', d: 'По истечении 24 часов — дальнейшая работа заблокирована до закрытия смены.' }], warning: 'Незакрытая смена более 24 часов — нарушение налогового законодательства РК.' },
+  'search-code': { title: 'Поиск товара по коду', ch: '4.1.1', color: 'var(--c4)', steps: [{ t: 'Ввод кода', d: 'Введите внутренний код товара (артикул) с клавиатуры → нажмите Enter.' }], info: 'Внутренний код отличается от штрих-кода. Уточняйте в справочнике товаров.' },
+};
+
+// ─── SHOW DETAIL ──────────────────────────
+function showDetail(id) {
+  const d = details[id];
+  if (!d) return;
+
+  hideAll();
+  const page = document.getElementById('page-detail');
+  page.style.display = 'block';
+  page.classList.add('active');
+
+  let stepsHtml = d.steps.map((s,i) => `
+    <div class="step-item">
+      <div class="step-num" style="background:${d.color}">${i+1}</div>
+      <div class="step-text"><strong>${s.t}.</strong> ${s.d}</div>
+    </div>`).join('');
+
+  let warningHtml = d.warning ? `<div class="warning-box"><div class="warning-icon">⚠️</div><div>${d.warning}</div></div>` : '';
+  let infoHtml = d.info ? `<div class="info-box"><div class="warning-icon">ℹ️</div><div>${d.info}</div></div>` : '';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:${d.color};font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:4px">РАЗДЕЛ ${d.ch}</div>
+      <h2 style="font-size:20px;font-weight:700">${d.title}</h2>
+    </div>
+    <div class="detail-card">
+      <h3>Порядок действий <span class="label">${d.steps.length} шага</span></h3>
+      <div class="step-list">${stepsHtml}</div>
+      ${warningHtml}
+      ${infoHtml}
+    </div>
+    <div style="margin-top:12px">
+      <button onclick="history.back()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 16px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">← Назад</button>
+    </div>
+  `;
+
+  document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+}
+
+// ─── SEARCH ───────────────────────────────
+function doSearch(val) {
+  const q = val.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.nav-sub-item, .nav-chapter-btn').forEach(el => el.classList.remove('hidden'));
+    return;
+  }
+  document.querySelectorAll('.nav-sub-item').forEach(btn => {
+    const match = btn.textContent.toLowerCase().includes(q);
+    btn.classList.toggle('hidden', !match);
+    if (match) {
+      const sub = btn.closest('.nav-sub');
+      if (sub) { sub.classList.add('open'); sub.previousElementSibling?.classList.add('open'); }
+    }
+  });
+}
+
+// ─── INIT ─────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') goHome();
+});
+</script>
+</body>
+</html>

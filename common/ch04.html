@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Глава 4 — Ведение Каталога товаров</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#656d76;--acc:#2f81f7}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+.tb{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+.bk{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);min-height:40px;white-space:nowrap}
+.bk:active{background:var(--border)}
+.tb-t{font-size:13px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ch-nav::-webkit-scrollbar{display:none}
+.cp{display:inline-flex;align-items:center;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;text-decoration:none;white-space:nowrap}
+.cp.here{background:rgba(47,129,247,.15);border-color:rgba(47,129,247,.4);color:var(--acc)}
+.hero{padding:24px 16px 20px;max-width:720px;margin:0 auto;border-bottom:1px solid var(--border)}
+.ch-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--acc);background:rgba(47,129,247,.1);border:1px solid rgba(47,129,247,.25);padding:3px 10px;border-radius:100px;margin-bottom:10px}
+.hero h1{font-size:clamp(20px,5vw,28px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.hero .lead{font-size:14px;color:var(--text2);line-height:1.6;max-width:600px}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.mtag{font-size:10px;padding:3px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'JetBrains Mono',monospace}
+.toc{margin:16px;max-width:688px;margin-left:auto;margin-right:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.toc-h{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;background:var(--bg3)}
+.toc-h:active{background:var(--border)}
+.toc-arr{margin-left:auto;color:var(--text3);font-size:16px;transition:transform .2s}
+.toc.open .toc-arr{transform:rotate(90deg)}
+.toc-b{display:none;padding:8px 0}
+.toc.open .toc-b{display:block}
+.toc-i{display:flex;align-items:center;gap:10px;padding:8px 16px;text-decoration:none;color:var(--text2);font-size:13px}
+.toc-i:active{background:var(--bg3);color:var(--text)}
+.toc-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);min-width:32px}
+.content{max-width:720px;margin:0 auto;padding:0 16px}
+.sec{margin-top:28px}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec h2{font-size:18px;font-weight:700;margin-bottom:12px;line-height:1.3;border-top:2px solid var(--acc);padding-top:12px}
+.sec h3{font-size:15px;font-weight:700;margin:16px 0 8px;color:var(--text)}
+.para{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px}
+.para strong{color:var(--text)}
+.para em{color:var(--acc);font-style:normal}
+.ibox{display:flex;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6;margin:12px 0}
+.ibox.blue{background:rgba(47,129,247,.07);border:1px solid rgba(47,129,247,.22)}
+.ibox.orange{background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.22)}
+.ibox-i{font-size:18px;flex-shrink:0}
+.mod-grid{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.mod{display:flex;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px}
+.mod-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.mod-name{font-weight:600;color:var(--text);margin-bottom:3px}
+.mod-desc{color:var(--text2);line-height:1.5;font-size:12px}
+.m-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:600;margin-left:6px;vertical-align:middle;background:rgba(47,129,247,.12);color:var(--acc);border:1px solid rgba(47,129,247,.2)}
+.scheme{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);line-height:2.2;overflow-x:auto}
+.hl{color:var(--acc);font-weight:600}
+.hl2{color:#f0883e;font-weight:600}
+.hl3{color:#3fb950;font-weight:600}
+.arr{color:var(--text3)}
+.feat-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.feat{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:13px}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px}
+.feat-text{color:var(--text2);line-height:1.5}
+.feat-text strong{color:var(--text)}
+.nav-bottom{display:flex;justify-content:space-between;padding:20px 16px 0;max-width:720px;margin:32px auto 0;border-top:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text2);font-size:13px;min-height:44px}
+.nav-btn:active{background:var(--bg3)}
+.nav-btn.next{background:rgba(47,129,247,.1);border-color:rgba(47,129,247,.3);color:var(--acc)}
+.footer{text-align:center;padding:28px 16px 0;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+</style></head><body>
+<div class="tb"><a class="bk" href="index.html">← Все главы</a><div class="tb-t">Гл.4 · Каталог товаров</div></div>
+<div class="ch-nav"><a class="cp" href="ch01.html">01</a><a class="cp" href="ch02.html">02</a><a class="cp" href="ch03.html">03</a><a class="cp  here" href="ch04.html">04</a><a class="cp" href="ch05.html">05</a><a class="cp" href="ch06.html">06</a><a class="cp" href="ch07.html">07</a><a class="cp" href="ch08.html">08</a><a class="cp" href="ch09.html">09</a><a class="cp" href="ch10.html">10</a><a class="cp" href="ch11.html">11</a><a class="cp" href="ch12.html">12</a><a class="cp" href="ch13.html">13</a><a class="cp" href="ch14.html">14</a><a class="cp" href="ch15.html">15</a><a class="cp" href="ch16.html">16</a><a class="cp" href="ch17.html">17</a><a class="cp" href="ch18.html">18</a><a class="cp" href="ch19.html">19</a><a class="cp" href="ch20.html">20</a><a class="cp" href="ch21.html">21</a><a class="cp" href="ch22.html">22</a><a class="cp" href="ch23.html">23</a><a class="cp" href="ch24.html">24</a><a class="cp" href="ch25.html">25</a><a class="cp" href="ch26.html">26</a><a class="cp" href="ch27.html">27</a><a class="cp" href="ch28.html">28</a><a class="cp" href="ch29.html">29</a><a class="cp" href="ch30.html">30</a></div>
+<div class="hero"><div class="ch-badge">Глава 4 · Справочное руководство</div>
+<h1>Ведение Каталога товаров</h1><p class="lead">Структура карточки товара, единицы измерения, составные товары, иерархия групп, ценообразование, печать ценников. Версия 3.0.</p>
+<div class="meta-row"><span class="mtag">Товаровед</span><span class="mtag">Оператор</span><span class="mtag">Категорийный менеджер</span><span class="mtag">v3.0</span></div></div>
+<div class="content">
+<div class="sec">
+  <div class="sec-label">Введение</div>
+  <p class="para">Каталог товаров — основа системы, вокруг которой строится работа всех остальных частей. Ведётся единый каталог для всей группы компаний независимо от архитектуры. Редактирование осуществляется в модуле <strong>«Каталог товаров»</strong>.</p>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 1</div>
+  <h2>Структура карточки товара</h2>
+  <h3>Общие поля (для всех подгрупп компаний)</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Поле</th><th>Описание</th></tr>
+    <tr><td><strong>Артикул</strong></td><td>Генерируется автоматически: номер группы + код товара через дефис. Код товара изменить нельзя.</td></tr>
+    <tr><td><strong>Старый артикул</strong></td><td>Артикул из предыдущей системы или собственный альтернативный. Вводится вручную.</td></tr>
+    <tr><td><strong>Название товара</strong></td><td>Основное название, до 100 символов. Используется в большинстве документов.</td></tr>
+    <tr><td><strong>Название для чека</strong></td><td>Сокращённое — для фискального принтера. Длина зависит от типа ФП.</td></tr>
+    <tr><td><strong>Название от производителя</strong></td><td>На языке производителя. Для прайс-листов и работы с поставщиками.</td></tr>
+    <tr><td><strong>Производитель</strong></td><td>Из справочника юридических лиц и производителей.</td></tr>
+    <tr><td><strong>Торговая марка</strong></td><td>Из списка торговых марок производителя.</td></tr>
+    <tr><td><strong>Базовая ед. измерения</strong></td><td>Минимальная неделимая единица. Не может быть дробной (не кг, не литр — только г, мл, шт).</td></tr>
+    <tr><td><strong>Штрих-код</strong></td><td>EAN-13 производителя или внутренний (генерируется системой). Может быть пустым.</td></tr>
+    <tr><td><strong>Операция по НДС</strong></td><td>«НДС 20%» или «Без НДС». Влияет на все операции с товаром.</td></tr>
+    <tr><td><strong>Подакцизный товар</strong></td><td>Признак для алкоголя, табака — ставка акциза регулируется законодательством.</td></tr>
+    <tr><td><strong>Признак устаревания</strong></td><td>Устаревшие товары не показываются при приходовании и продаже, но история сохраняется.</td></tr>
+    <tr><td><strong>Примечание</strong></td><td>Доп. информация — может выводиться на этикетки весов (например, состав продукции собственного производства).</td></tr>
+  </table></div>
+
+  <h3>Поля на уровне подгруппы компаний</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Поле</th><th>Описание</th></tr>
+    <tr><td><strong>Учитывать в подгруппе</strong></td><td>Если Нет — товар недоступен при приходовании и продаже в этой подгруппе. Причина сообщения «Товар не найден».</td></tr>
+    <tr><td><strong>Дилерская категория</strong></td><td>Уровень цены для данной подгруппы.</td></tr>
+    <tr><td><strong>Наценка / Мин. / Макс. %</strong></td><td>Параметры автоматической расценки при приходе товара.</td></tr>
+    <tr><td><strong>Барьер удержания цены (%)</strong></td><td>Если новая приходная цена изменилась менее чем на Х% — цена реализации не пересчитывается.</td></tr>
+    <tr><td><strong>Цена спецпредложения</strong></td><td>Для определённой категории клиентов — специальная цена при достижении объёма.</td></tr>
+    <tr><td><strong>Значение бонуса</strong></td><td>Бонусные баллы начисляемые за единицу товара.</td></tr>
+  </table></div>
+
+  <div class="ibox warn"><span class="ibox-i">⚠️</span><div>Если товар не находится при добавлении в накладную — проверьте признак <strong>«Учитывать в подгруппе»</strong>. Возможно он не включён для вашей подгруппы компаний.</div></div>
+</div>
+
+<div class="sec">
+  <h2>Единицы измерения товара</h2>
+  <p class="para">Каждый товар должен иметь минимум одну — базовую — единицу измерения. Дополнительные единицы связаны с базовой коэффициентом пересчёта.</p>
+
+  <h3>Рекомендуемые настройки единиц измерения</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Тип товара</th><th>Базовая ед.</th><th>Ед. по умолчанию</th><th>Осн. фасовка</th></tr>
+    <tr><td>Весовой товар</td><td>Грамм (г)</td><td>Килограмм (кг)</td><td>кг</td></tr>
+    <tr><td>Жидкий товар</td><td>Миллилитр (мл)</td><td>Литр (л)</td><td>л</td></tr>
+    <tr><td>Штучный без фасовки</td><td>шт</td><td>шт</td><td>шт</td></tr>
+    <tr><td>Штучный с фасовкой</td><td>шт</td><td>шт</td><td>Ящик 20 шт</td></tr>
+  </table></div>
+
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Продажи запрещены</strong> — блокирует продажу в данной ед. измерения. Для весовых: продажи в граммах запрещены, в кг — разрешены.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Производный товар</strong> — к дополнительной ед. измерения можно привязать отдельный товар-производный (ящик = отдельная карточка товара).</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Печатать отдельный ценник</strong> — если нужен ценник на нестандартную ед. измерения (например, на ящик отдельно от штучного).</div></div>
+  </div>
+
+  <div class="ibox warn"><span class="ibox-i">⚠️</span><div>Для дробных единиц измерения (кг, л) обязательно установите признак дробности в справочнике «Единицы измерения». Иначе система будет округлять количество до целых, что приводит к ошибкам в весовых товарах.</div></div>
+</div>
+
+<div class="sec">
+  <h2>Составные товары</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Тип</th><th>Описание</th><th>Применение</th></tr>
+    <tr><td><strong>Изделие</strong></td><td>Товар состоит из компонент с альтернативами</td><td>Калькуляционные карты, производство</td></tr>
+    <tr><td><strong>Комплект</strong></td><td>Несколько товаров как один набор</td><td>Подарочные наборы, акционные комплекты</td></tr>
+    <tr><td><strong>Сырьё</strong></td><td>Исходный материал для производства</td><td>Пекарня, кулинария (Глава 28)</td></tr>
+  </table></div>
+  <p class="para">Последовательность ввода составного товара: сначала создать все компоненты как обычные товары → затем создать составной товар → добавить позиции состава → для каждой позиции можно указать альтернативы (взаимозаменяемые компоненты).</p>
+</div>
+
+<div class="sec">
+  <h2>Базовые и производные товары</h2>
+  <p class="para">Используется для товаров в разных формах упаковки: <strong>базовый</strong> — штучный товар (продаётся в магазине), <strong>производный</strong> — фасованный (ящик, упаковка для оптовой базы).</p>
+  <div class="ibox blue"><span class="ibox-i">ℹ️</span><div>При перемещении товаров с оптовой базы в магазин производные товары автоматически конвертируются в базовые. Например: «Молоко 1л ящик 12шт» → 12 × «Молоко 1л».</div></div>
+</div>
+
+<div class="sec">
+  <h2>Связи между товарами</h2>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Альтернативы</strong> — товары-заменители. Используются в производстве (можно использовать любой из альтернатив) или для аналитики схожих позиций. Задаётся коэффициент пересчёта.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Родственники по штрих-коду</strong> — несколько разных товаров с одним штрих-кодом производителя. Каждому присваивается внутренний штрих-код, оригинальный товар помечается «Продажи запрещены».</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Уценённые товары</strong> — связь между качественным и просроченным/повреждённым товаром. Позволяет уценить часть остатков, не трогая основную карточку.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Сопутствующие товары</strong> — для рекомендаций при продаже (интернет-магазин).</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 2</div>
+  <h2>Иерархия групп товаров</h2>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Глубина иерархии не ограничена. Рекомендуется не более 4–5 уровней для удобства работы.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Создание группы: выбрать родительскую → «Добавить группу» → задать название.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">К группе привязываются <strong>Свойства</strong> — дополнительные характеристики товаров этой группы (цвет, размер, бренд и т.д.).</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Альтернативные иерархии</strong> — дополнительные группировки товаров для аналитики, не совпадающие с основной структурой каталога (по сезону, производителю, целевой аудитории).</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 3</div>
+  <h2>Ввод и редактирование товара</h2>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="st">Выберите нужную группу в иерархии слева → кнопка <strong>«Добавить»</strong>.</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Заполните обязательные поля: Название, Производитель, Базовая ед. измерения, Операция по НДС.</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Введите штрих-код или нажмите <strong>«Генерировать»</strong> для внутреннего.</div></div>
+    <div class="step"><div class="sn">4</div><div class="st">На вкладке <strong>«Единицы измерения»</strong> добавьте дополнительные ед. с коэффициентами пересчёта.</div></div>
+    <div class="step"><div class="sn">5</div><div class="st">На вкладке <strong>«Цены»</strong> задайте параметры ценообразования для вашей подгруппы компаний.</div></div>
+    <div class="step"><div class="sn">6</div><div class="st">Сохраните. Артикул генерируется автоматически.</div></div>
+  </div>
+  <div class="ibox warn"><span class="ibox-i">⚠️</span><div>Перед вводом нового товара — ищите существующий по штрих-коду и названию. Дублирующие карточки — основная причина пересортицы в системе.</div></div>
+
+  <h3>Быстрый поиск в каталоге</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>По артикулу</strong> — введите только код товара (без кода группы).</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>По штрих-коду</strong> — отсканируйте или введите вручную.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>По названию</strong> — введите часть названия.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Остатки на складе</strong> — видны прямо в каталоге при выборе торговой площадки.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>История продажных цен</strong> — по каждому товару доступна история изменений цен реализации.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 4</div>
+  <h2>Ввод цен и наценок по дилерским категориям</h2>
+  <p class="para">В карточке товара на вкладке <strong>«Цены»</strong> задаются параметры ценообразования для каждой подгруппы компаний:</p>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Дилерская категория</strong> — базовый уровень цены (Розница, Опт, VIP и т.д.).</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Наценка %</strong> — процент от приходной цены для расчёта цены реализации.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Мин. / Макс. % наценки</strong> — ограничители для автоматической расценки оператором.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Признак фиксирования цены</strong> — фиксированная цена не пересчитывается при новом приходе автоматически.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Индикатив</strong> — государственная индикативная цена (верхний предел).</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text"><strong>Цена спецпредложения</strong> — для клиентов определённой категории при достижении объёма.</div></div>
+  </div>
+  <p class="para">Подробно вся система ценообразования описана в <strong>Главе 10</strong>.</p>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 5</div>
+  <h2>Печать ценников из каталога</h2>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="st">Выберите товары в каталоге (один или несколько через Ctrl+клик).</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Кнопка <strong>«Печать ценников»</strong> → откроется диалог печати ценников (модуль Глава 21).</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Выберите формат ценника → количество копий → «Печать».</div></div>
+  </div>
+  <div class="ibox blue"><span class="ibox-i">ℹ️</span><div>Ценники удобнее печатать прямо из журнала Приходных накладных — сразу при оприходовании товара. Это экономит время при приёмке.</div></div>
+</div>
+</div>
+<div class="nav-bottom"><a class="nav-btn" href="index.html">← Все главы</a><a class="nav-btn" href="ch03.html">← Глава 3</a><a class="nav-btn next" href="ch05.html">Глава 5 →</a></div>
+<div class="footer">ПС СПРУТ™ · ВИМАС Технологии, 1997–2025 · FirKaan KB v1.0</div>
+</body></html>

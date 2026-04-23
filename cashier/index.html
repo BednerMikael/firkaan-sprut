@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Кассир — СПРУТ POS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#656d76;--rc:#3fb950}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:56px}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.back{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);white-space:nowrap;min-height:40px}
+.back:active{background:var(--border)}
+.topbar-title{font-size:14px;font-weight:700}
+.hero{padding:22px 16px 16px;max-width:640px;margin:0 auto}
+.role-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.role-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.25);flex-shrink:0}
+.role-info h2{font-size:20px;font-weight:800}
+.role-info p{font-size:12px;color:var(--text2);margin-top:3px}
+.role-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:10px;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;border:1px solid;white-space:nowrap}
+.tag-g{color:var(--rc);border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.08)}
+.tag-n{color:var(--text3);border-color:var(--border);background:var(--bg3)}
+.notice{margin:0 16px 0;max-width:640px;margin-left:auto;margin-right:auto;padding:12px 14px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.6}
+.notice strong{color:var(--rc)}
+.lbl{padding:20px 16px 8px;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'JetBrains Mono',monospace;max-width:640px;margin:0 auto;display:block}
+.cards{display:flex;flex-direction:column;gap:8px;padding:0 16px;max-width:640px;margin:0 auto}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit}
+.card-head{display:flex;align-items:center;gap:12px;padding:14px 14px;cursor:pointer;min-height:58px}
+.card-head:active{background:var(--bg3)}
+.card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);flex-shrink:0}
+.card-title{font-size:14px;font-weight:600;flex:1;line-height:1.3}
+.card-arr{color:var(--text3);font-size:18px;transition:transform .2s;flex-shrink:0}
+.card.open .card-arr{transform:rotate(90deg)}
+.card-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border)}
+.card.open .card-body{display:block}
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
+.step-n{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--rc);color:#0d1117;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;color:var(--text2);line-height:1.55}
+.step-t strong{color:var(--text)}
+.warn{display:flex;gap:10px;margin-top:10px;padding:10px 12px;background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.22);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5}
+.info{display:flex;gap:10px;margin-top:10px;padding:10px 12px;background:rgba(47,129,247,.07);border:1px solid rgba(47,129,247,.22);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5}
+.wi{font-size:16px;flex-shrink:0}
+.go-link{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:8px;text-decoration:none;color:var(--rc);font-size:13px;font-weight:600;transition:background .15s}
+.go-link:active{background:rgba(63,185,80,.15)}
+.go-link span{margin-left:auto;font-size:18px}
+.ext-link{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;transition:background .15s}
+.ext-link:active{background:var(--bg3)}
+.ext-links{display:flex;flex-direction:column;gap:8px;padding:0 16px;max-width:640px;margin:0 auto}
+.footer{text-align:center;padding:28px 16px 0;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back" href="../index.html">← Главная</a>
+  <div class="topbar-title">🛒 Кассир</div>
+</div>
+
+<div class="hero" style="max-width:640px;margin:0 auto">
+  <div class="role-head">
+    <div class="role-icon">🛒</div>
+    <div class="role-info">
+      <h2>Кассир</h2>
+      <p>Работа на кассовом терминале СПРУТ POS</p>
+    </div>
+  </div>
+  <div class="role-tags">
+    <span class="tag tag-g">СПРУТ POS</span>
+    <span class="tag tag-n">Смены</span>
+    <span class="tag tag-n">Оплата</span>
+    <span class="tag tag-n">Возврат</span>
+    <span class="tag tag-n">Товар</span>
+    <span class="tag tag-n">Скидки</span>
+  </div>
+</div>
+
+<div class="notice" style="margin:0 16px 0;max-width:608px;margin-left:auto;margin-right:auto">
+  <strong>Ваш основной инструмент — СПРУТ POS.</strong> Все операции выполняются на кассовом терминале. Для администраторских действий (возврат без чека, скидки сверх лимита) потребуется подтверждение администратора.
+</div>
+
+<!-- БЫСТРЫЙ СТАРТ -->
+<span class="lbl">⚡ Быстрый старт рабочего дня</span>
+<div class="cards">
+
+  <div class="card" id="c-start">
+    <div class="card-head" onclick="tog('c-start')">
+      <div class="card-icon">🔑</div>
+      <div class="card-title">1. Авторизация и открытие смены</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Включите кассовый компьютер. Оболочка <strong>СПРУТ POS Desktop</strong> запустится автоматически.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Введите <strong>логин и пароль</strong> вручную, или поднесите карточку к считывателю.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Система автоматически проверит оборудование (ФП) и лицензию.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Подтвердите <strong>открытие смены</strong> — автоматически напечатается нулевой чек (0-чек).</div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-t">Проверьте дату и время на чеке. Расхождение? → <strong>Меню → Установка даты и времени</strong>.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>Расхождение времени на чеке критично для ФНО. Исправьте до начала продаж.</div></div>
+      <div class="warn"><span class="wi">⚠️</span><div>Если ФП не найден — продажи невозможны. Создайте заявку в <strong>OKDesk</strong> и вызовите IT.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ПРОДАЖИ -->
+<span class="lbl">🛒 Продажа товаров</span>
+<div class="cards">
+
+  <div class="card" id="c-sale">
+    <div class="card-head" onclick="tog('c-sale')">
+      <div class="card-icon">🏷️</div>
+      <div class="card-title">Обычная продажа</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Отсканируйте штрих-код товара или найдите по коду / названию (F3).</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Проверьте цену в списке. Для весового товара — взвесьте, введите или получите вес с весов автоматически.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">При необходимости скорректируйте <strong>количество</strong>: введите число до сканирования или измените после добавления.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Добавляйте все позиции. Нажмите <strong>«Оплата»</strong> (или F10).</div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-t">Выберите способ оплаты → подтвердите → выдайте чек и сдачу.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Повторное сканирование того же товара увеличивает количество автоматически (режим немедленного редактирования).</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-alco">
+    <div class="card-head" onclick="tog('c-alco')">
+      <div class="card-icon">🍾</div>
+      <div class="card-title">Алкоголь и табак — особенности</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Система запросит <strong>подтверждение возраста</strong> (18+). Проверьте документ покупателя.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">В ночное время продажа <strong>заблокирована</strong> автоматически.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Для крепкого алкоголя — отсканируйте <strong>акцизную марку</strong> (обязательно).</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Алкоголь на разлив: специальный режим → введите объём в мл.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>Отказ в продаже несовершеннолетним — ваша прямая обязанность. При сомнении в возрасте всегда требуйте документ.</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-cert">
+    <div class="card-head" onclick="tog('c-cert')">
+      <div class="card-icon">🎁</div>
+      <div class="card-title">Продажа подарочных сертификатов</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Найдите позицию <strong>«Сертификат»</strong> в каталоге → выберите номинал → добавьте в чек.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Для пополняемого сертификата → укажите сумму пополнения.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Оплатите как обычный товар → система активирует сертификат.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Для проверки баланса сертификата — отсканируйте его в режиме «Запрос информации» (без добавления в чек).</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-softcheck">
+    <div class="card-head" onclick="tog('c-softcheck')">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Режим мягкого чека</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Активируйте через меню — чек становится предварительным (не проводится фискально).</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Добавляйте и меняйте товары без ограничений.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Для оплаты — подтвердите чек → он становится обычным с фискальной регистрацией.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Можно <strong>отложить</strong> и вернуться позже через Реестр документов.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Используйте мягкий чек когда покупатель ещё выбирает или нужно собрать заказ заранее.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ОПЛАТА -->
+<span class="lbl">💳 Способы оплаты</span>
+<div class="cards">
+
+  <div class="card" id="c-cash">
+    <div class="card-head" onclick="tog('c-cash')">
+      <div class="card-icon">💵</div>
+      <div class="card-title">Наличные</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">В окне оплаты нажмите <strong>«Наличные»</strong>.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Введите сумму от покупателя → система рассчитает сдачу автоматически.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Нажмите Enter → касса открывается → выдайте чек и сдачу.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="c-card">
+    <div class="card-head" onclick="tog('c-card')">
+      <div class="card-icon">💳</div>
+      <div class="card-title">Банковская карта</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Нажмите <strong>«Карта»</strong> → сумма автоматически передаётся на терминал.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Покупатель прикладывает карту / телефон → ждите ответа банка.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">«Одобрено» → печатается чек и слип. «Отказано» → предложите другой способ оплаты.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>При отказе — не пытайтесь провести повторно без согласия покупателя.</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-bonus">
+    <div class="card-head" onclick="tog('c-bonus')">
+      <div class="card-icon">⭐</div>
+      <div class="card-title">Бонусы</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Отсканируйте карту лояльности или введите номер телефона клиента.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Выберите <strong>«Бонусы»</strong> → система покажет доступный баланс.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Полная оплата (если баланс ≥ сумме) или частичная (остаток закрыть другим способом).</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>«Копейки на бонусный счёт» — сдача в копейках зачисляется на бонусный счёт вместо выдачи наличными.</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-mixed">
+    <div class="card-head" onclick="tog('c-mixed')">
+      <div class="card-icon">🔀</div>
+      <div class="card-title">Частичная (смешанная) оплата</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Введите первую часть суммы первым способом (напр., наличные).</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Система покажет <strong>остаток</strong> — оплатите картой, бонусами или сертификатом.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">После полного покрытия суммы — чек закрывается автоматически.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Можно комбинировать: наличные + карта, сертификат + карта, бонусы + наличные.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ВОЗВРАТ -->
+<span class="lbl">↩️ Возвраты</span>
+<div class="cards">
+
+  <div class="card" id="c-ret1">
+    <div class="card-head" onclick="tog('c-ret1')">
+      <div class="card-icon">🧾</div>
+      <div class="card-title">Возврат по чеку</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Меню → Возврат</strong> или нажмите функциональную клавишу.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Введите номер чека или отсканируйте штрих-код с чека.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Выберите: <strong>весь чек</strong> или только нужный товар.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Укажите причину возврата (обязательно).</div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-t">Возврат денег тем же способом, которым была оплата.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Для чека с другой кассы — нужны расширенные права (обычно администратор).</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-ret2">
+    <div class="card-head" onclick="tog('c-ret2')">
+      <div class="card-icon">🚫</div>
+      <div class="card-title">Возврат без чека</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="warn"><span class="wi">⚠️</span><div>Возврат без чека — <strong>только администратор</strong>. Кассир не может выполнить самостоятельно. Вызовите администратора для подтверждения.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- УПРАВЛЕНИЕ ЧЕКОМ -->
+<span class="lbl">📝 Управление чеком и товаром</span>
+<div class="cards">
+
+  <div class="card" id="c-del">
+    <div class="card-head" onclick="tog('c-del')">
+      <div class="card-icon">🗑️</div>
+      <div class="card-title">Удаление позиции / отмена чека</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Выберите позицию → нажмите <strong>Delete</strong> или кнопку «Удалить».</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Отмена всего чека: <strong>Меню → Отменить чек</strong> → подтвердите.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>Все удаления (сторно) фиксируются. При превышении лимита за смену — требуется подтверждение администратора.</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-price">
+    <div class="card-head" onclick="tog('c-price')">
+      <div class="card-icon">💲</div>
+      <div class="card-title">Запрос цены без добавления в чек</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Переключитесь в режим <strong>«Запрос цены»</strong> (не режим продажи).</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Отсканируйте штрих-код — система покажет цену без добавления в чек.</div></div>
+      </div>
+      <div class="info"><span class="wi">ℹ️</span><div>Используйте для ответа на вопросы покупателей о цене без нарушения текущего чека.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ЗАКРЫТИЕ СМЕНЫ -->
+<span class="lbl">🔒 Закрытие смены</span>
+<div class="cards">
+
+  <div class="card" id="c-close">
+    <div class="card-head" onclick="tog('c-close')">
+      <div class="card-icon">🏁</div>
+      <div class="card-title">Порядок закрытия смены</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Убедитесь что нет незакрытых / отложенных чеков (проверьте Реестр документов).</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Пересчитайте деньги в кассовом ящике.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Z-отчёт</strong> — фискальное закрытие смены. После него смена закрывается автоматически.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Или вручную: <strong>Главное меню → Закрытие смены</strong>.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>Смена не может превышать <strong>24 часа</strong> — требование ФНО РК. При приближении — система предупредит.</div></div>
+      <div class="warn"><span class="wi">⚠️</span><div>Смена не закроется при наличии отложенных чеков или излишка денег сверх нормы — нужен администратор.</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="c-xz">
+    <div class="card-head" onclick="tog('c-xz')">
+      <div class="card-icon">📊</div>
+      <div class="card-title">X-отчёт и Z-отчёт — в чём разница</div>
+      <div class="card-arr">›</div>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">X</div><div class="step-t"><strong>X-отчёт</strong> — промежуточный. Показывает текущие итоги смены. Смену НЕ закрывает. Можно снимать несколько раз.</div></div>
+        <div class="step"><div class="step-n">Z</div><div class="step-t"><strong>Z-отчёт</strong> — фискальный отчёт закрытия. Закрывает смену, обнуляет счётчики ФП. Снимается один раз в конце.</div></div>
+      </div>
+      <div class="warn"><span class="wi">⚠️</span><div>Z-отчёт необратим. Убедитесь что смена завершена прежде чем его снять.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ССЫЛКИ НА ПОЛНЫЕ ГЛАВЫ -->
+<span class="lbl">📚 Полные инструкции (СПРУТ POS)</span>
+<div class="ext-links">
+  <a class="ext-link" href="pos.html">
+    <span>🖥️</span>
+    <div><div style="font-size:14px;font-weight:600">Полное руководство СПРУТ POS</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Интерфейс · сеанс работы · кассовые операции · товар · скидки · оплата</div></div>
+    <span style="margin-left:auto;color:var(--text3);font-size:18px">›</span>
+  </a>
+  <a class="ext-link" href="../common/ch12.html">
+    <span>📋</span>
+    <div><div style="font-size:14px;font-weight:600">Гл. 12 — Розничная торговля (BackOffice)</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Кассовая книга · Z-отчёты · сверка выручки · кредитные карты</div></div>
+    <span style="margin-left:auto;color:var(--text3);font-size:18px">›</span>
+  </a>
+</div>
+
+<div class="footer">ПС СПРУТ™ · ВИМАС Технологии · FirKaan KB v1.0</div>
+
+<script>
+function tog(id){
+  const c=document.getElementById(id);
+  c.classList.toggle('open');
+}
+</script>
+</body>
+</html>

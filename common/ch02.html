@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Глава 2 — Архитектура системы ПС «СПРУТ»</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#656d76;--acc:#2f81f7}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+.tb{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+.bk{display:inline-flex;align-items:center;gap:5px;color:var(--text2);text-decoration:none;font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);min-height:40px;white-space:nowrap}
+.bk:active{background:var(--border)}
+.tb-t{font-size:13px;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ch-nav::-webkit-scrollbar{display:none}
+.cp{display:inline-flex;align-items:center;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;text-decoration:none;white-space:nowrap}
+.cp.here{background:rgba(47,129,247,.15);border-color:rgba(47,129,247,.4);color:var(--acc)}
+.hero{padding:24px 16px 20px;max-width:720px;margin:0 auto;border-bottom:1px solid var(--border)}
+.ch-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--acc);background:rgba(47,129,247,.1);border:1px solid rgba(47,129,247,.25);padding:3px 10px;border-radius:100px;margin-bottom:10px}
+.hero h1{font-size:clamp(18px,5vw,26px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.hero .lead{font-size:14px;color:var(--text2);line-height:1.6;max-width:600px}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.mtag{font-size:10px;padding:3px 10px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'JetBrains Mono',monospace}
+.content{max-width:720px;margin:0 auto;padding:0 16px}
+.sec{margin-top:28px}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec h2{font-size:18px;font-weight:700;margin-bottom:12px;line-height:1.3;border-top:2px solid var(--acc);padding-top:12px}
+.sec h3{font-size:15px;font-weight:700;margin:16px 0 8px;color:var(--text)}
+.sec h4{font-size:13px;font-weight:700;margin:12px 0 6px;color:var(--text2)}
+.para{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:12px}
+.para strong{color:var(--text)}
+.ibox{display:flex;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6;margin:12px 0}
+.ibox.blue{background:rgba(47,129,247,.07);border:1px solid rgba(47,129,247,.22)}
+.ibox.orange{background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.22)}
+.ibox.warn{background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.22)}
+.ibox-i{font-size:18px;flex-shrink:0}
+.mod-grid{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.mod{display:flex;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px}
+.mod-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.mod-name{font-weight:600;color:var(--text);margin-bottom:3px}
+.mod-desc{color:var(--text2);line-height:1.5;font-size:12px}
+.scheme{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);line-height:2;overflow-x:auto}
+.hl{color:#2f81f7;font-weight:600}.hl2{color:#f0883e;font-weight:600}.hl3{color:#3fb950;font-weight:600}.hl4{color:#bc8cff;font-weight:600}
+.feat-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.feat{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:13px}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px}
+.feat-text{color:var(--text2);line-height:1.5}.feat-text strong{color:var(--text)}
+.steps{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:13px}
+.sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:#2f81f7;color:#0d1117;flex-shrink:0;margin-top:1px;font-family:'JetBrains Mono',monospace}
+.st{color:var(--text2);line-height:1.55}.st strong{color:var(--text)}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg3);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2);border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.5}
+td strong{color:var(--text)}
+.nav-bottom{display:flex;justify-content:space-between;padding:20px 16px 0;max-width:720px;margin:32px auto 0;border-top:1px solid var(--border);gap:8px;flex-wrap:wrap}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text2);font-size:13px;min-height:44px}
+.nav-btn:active{background:var(--bg3)}
+.nav-btn.next{background:rgba(47,129,247,.1);border-color:rgba(47,129,247,.3);color:var(--acc)}
+.footer{text-align:center;padding:28px 16px 0;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+</style></head><body>
+<div class="tb"><a class="bk" href="index.html">← Все главы</a><div class="tb-t">Гл.2 · Архитектура системы</div></div>
+<div class="ch-nav">  <a class="cp" href="ch01.html">01</a>
+  <a class="cp here" href="ch02.html">02</a>
+  <a class="cp" href="ch03.html">03</a>
+  <a class="cp" href="ch04.html">04</a>
+  <a class="cp" href="ch05.html">05</a>
+  <a class="cp" href="ch06.html">06</a>
+  <a class="cp" href="ch07.html">07</a>
+  <a class="cp" href="ch08.html">08</a>
+  <a class="cp" href="ch09.html">09</a>
+  <a class="cp" href="ch10.html">10</a>
+  <a class="cp" href="ch11.html">11</a>
+  <a class="cp" href="ch12.html">12</a>
+  <a class="cp" href="ch13.html">13</a>
+  <a class="cp" href="ch14.html">14</a>
+  <a class="cp" href="ch15.html">15</a>
+  <a class="cp" href="ch16.html">16</a>
+  <a class="cp" href="ch17.html">17</a>
+  <a class="cp" href="ch18.html">18</a>
+  <a class="cp" href="ch19.html">19</a>
+  <a class="cp" href="ch20.html">20</a>
+  <a class="cp" href="ch21.html">21</a>
+  <a class="cp" href="ch22.html">22</a>
+  <a class="cp" href="ch23.html">23</a>
+  <a class="cp" href="ch24.html">24</a>
+  <a class="cp" href="ch25.html">25</a>
+  <a class="cp" href="ch26.html">26</a>
+  <a class="cp" href="ch27.html">27</a>
+  <a class="cp" href="ch28.html">28</a>
+  <a class="cp" href="ch29.html">29</a>
+  <a class="cp" href="ch30.html">30</a>
+</div>
+<div class="hero">
+  <div class="ch-badge">Глава 2 · Справочное руководство</div>
+  <h1>Архитектура системы ПС «СПРУТ»</h1>
+  <p class="lead">ЦБД, ЛБД, подгруппы компаний, торговые площадки, внешние устройства и обмен данными.</p>
+  <div class="meta-row"><span class="mtag">IT-администратор</span><span class="mtag">Архитектура</span><span class="mtag">ЦБД/ЛБД</span><span class="mtag">Торговые площадки</span></div>
+</div>
+<div class="content">
+<div class="sec">
+  <div class="sec-label">Раздел 1</div>
+  <h2>Группа компаний, ЦБД и ЛБД</h2>
+  <p class="para">Все компании-продавцы, обслуживаемые ПС «СПРУТ», представляют собой <strong>Группу компаний</strong>. В структуре выделяется <strong>Центральная база данных</strong> (ЦБД) и <strong>Локальные базы данных</strong> (ЛБД). ЛБД функционируют в удалённых офисах.</p>
+  <div class="scheme">
+<span class="hl">ЦБД</span> — Центральная база данных (главный офис)
+<span style="color:var(--text3)">  ├─</span> <span class="hl2">Подгруппа 1</span>  (единая ценовая политика)
+<span style="color:var(--text3)">  │    ├─</span> <span class="hl3">Торговая площадка 1</span>  (Магазин №1)
+<span style="color:var(--text3)">  │    └─</span> <span class="hl3">Торговая площадка 2</span>  (Магазин №2)
+<span style="color:var(--text3)">  └─</span> <span class="hl2">Подгруппа 2</span>
+<span class="hl">ЛБД</span> — Локальная база данных (удалённый офис)
+<span style="color:var(--text3)">  └─</span> <span style="color:var(--acc)">Тиражирование</span> ↔ ЦБД (по каналам связи)
+  </div>
+  <p class="para"><strong>Тиражирование данных</strong> — передача изменений из ЦБД в ЛБД. Тиражируются: общие справочники, структура компании, каталог товаров. ЛБД создаётся когда компании группы территориально удалены и обеспечить надёжные каналы связи затруднительно.</p>
+  <div class="ibox blue"><span class="ibox-i">ℹ️</span><div>Компании в ЦБД и ЛБД могут работать практически автономно, но с едиными системными справочниками и каталогом товаров. Возможны распределённые запросы и консолидация аналитики между ЦБД и ЛБД.</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 2</div>
+  <h2>Подгруппы компаний</h2>
+  <p class="para">Внутри ЛБД (или ЦБД) компании могут быть объединены в <strong>подгруппы</strong>. Компании в подгруппе:</p>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Ведут единую ценовую политику — одинаковые цены реализации по всем дилерским категориям.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Торговля от всех компаний может идти из общего отдела выписки.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Компании из разных ЛБД не могут входить в одну подгруппу.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Имеют общий каталог цен поставщиков и список клиентов (опционально).</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 3</div>
+  <h2>Торговые площадки</h2>
+  <p class="para">Внутри подгруппы производится деление на <strong>Торговые площадки</strong> — торговые подразделения, логически отделённые от других. Подгруппа должна иметь хотя бы одну торговую площадку.</p>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">На торговой площадке могут вести торговлю одна или несколько компаний подгруппы.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Функционирует на одном или нескольких складах.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Может вести самостоятельную ценовую и закупочную политику.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Во всех модулях продаж указывается торговая площадка — от неё зависит набор товаров и списание со складов.</div></div>
+  </div>
+  <h3>Атрибуты торговой площадки для розницы</h3>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Список компаний, складов и дилерских категорий.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Справочник кассовых аппаратов — привязка ФП к рабочим местам.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Отделы и весы — структура торгового зала.</div></div>
+    <div class="feat"><div class="feat-dot"></div><div class="feat-text">Сервер торговой площадки — для автономной работы POS.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 4</div>
+  <h2>Организация работы с документами</h2>
+  <p class="para">Все документы в ПС «СПРУТ» имеют <strong>состояния</strong> (статусы). Переход между состояниями контролируется правами пользователей.</p>
+  <div class="ibox blue"><span class="ibox-i">📋</span><div>Пример для приходной накладной: <strong>Готовится</strong> → кладовщик заполняет; <strong>Оприходована</strong> → руководитель склада утверждает; <strong>Передана на склад</strong> → менеджер торгового зала принимает. Каждый переход требует отдельных прав.</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-label">Раздел 5</div>
+  <h2>Внешние устройства и обмен данными</h2>
+  <p class="para">Внешние устройства — торговое оборудование и программное обеспечение, с которым СПРУТ обменивается данными. Обмен включает экспорт изменений из СПРУТ на устройство и импорт данных обратно.</p>
+  <div class="mod-grid">
+    <div class="mod"><div class="mod-icon">🖥️</div><div><div class="mod-name">Сервер Торговой площадки (СТП)</div><div class="mod-desc">Приложение с базой данных Interbase. Обеспечивает автономную работу торговой площадки и обмен данными между POS-терминалами и основной БД. Один на торговую площадку.</div></div></div>
+    <div class="mod"><div class="mod-icon">🛒</div><div><div class="mod-name">СПРУТ POS</div><div class="mod-desc">Может работать напрямую с основной БД (без СТП) или через СТП. Внешнее устройство создаётся автоматически при установке СПРУТ POS.</div></div></div>
+    <div class="mod"><div class="mod-icon">⚖️</div><div><div class="mod-name">Отделы (Весы)</div><div class="mod-desc">Управление весами через основную БД или через СТП. При работе через СТП — данные весов забираются сервером торговой площадки.</div></div></div>
+    <div class="mod"><div class="mod-icon">📱</div><div><div class="mod-name">Терминалы сбора данных (ТСД)</div><div class="mod-desc">Управление через основную БД или СТП. Используются для инвентаризаций, приёма товаров, пересчётов.</div></div></div>
+    <div class="mod"><div class="mod-icon">🏧</div><div><div class="mod-name">Сервер EuroPOS VDM-261</div><div class="mod-desc">Обеспечивает работу POS-терминалов VDM-261. Регистрируется для торговой площадки в Справочнике.</div></div></div>
+  </div>
+  <div class="ibox orange"><span class="ibox-i">⚙️</span><div>Для каждого внешнего устройства ведутся <strong>логи обновлений</strong> — список изменённых данных с момента последнего обмена. Логи очищаются когда устройство забирает данные. При удалении устройства логи удаляются.</div></div>
+</div>
+</div>
+<div class="nav-bottom"><a class="nav-btn" href="index.html">← Все главы</a><a class="nav-btn" href="ch01.html">← Глава 1</a><a class="nav-btn next" href="ch03.html">Глава 3 →</a></div>
+<div class="footer">ПС СПРУТ™ · ВИМАС Технологии, 1997–2025 · FirKaan KB v1.0</div>
+</body></html>
